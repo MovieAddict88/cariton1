@@ -6,7 +6,7 @@
 <title>Booking Details - VeloDrive</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -29,6 +29,19 @@
 <style>
         body { font-family: 'Inter', sans-serif; }
         .ios-tab-bar { padding-bottom: env(safe-area-inset-bottom); }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen pb-24">
@@ -62,18 +75,18 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-6 mb-6">
-                <div id="vehicleImage" class="w-full md:w-48 h-32 bg-gray-200 dark:bg-gray-700 rounded-xl bg-center bg-cover"></div>
-                <div class="flex-1">
-                    <h3 id="vehicleName" class="text-lg font-bold mb-1">---</h3>
-                    <p id="plateNumber" class="text-sm text-gray-500 dark:text-gray-400 mb-3">---</p>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-gray-400 text-sm">settings_input_component</span>
-                            <span id="transmission">---</span>
+                <div id="vehicleImage" class="w-full md:w-48 h-40 bg-gray-200 dark:bg-gray-700 rounded-xl bg-center bg-cover shadow-inner shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="vehicleName" class="text-xl font-bold mb-1 truncate">---</h3>
+                    <p id="plateNumber" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">---</p>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-lg">settings_input_component</span>
+                            <span id="transmission" class="font-semibold">---</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-gray-400 text-sm">local_gas_station</span>
-                            <span id="fuelType">---</span>
+                        <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-lg">local_gas_station</span>
+                            <span id="fuelType" class="font-semibold">---</span>
                         </div>
                     </div>
                 </div>
@@ -138,7 +151,7 @@
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const bookingId = urlParams.get('id');
+    const bookingId = urlParams.get('booking_id');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
     if (!user) {
@@ -214,13 +227,13 @@
 
         if (booking.booking_status === 'pending' && !booking.payment_status) {
             actionButtons.innerHTML += `
-                <a href="payment_proof_upload.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
+                <a href="payment_proof_upload.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
                     Submit Payment
                 </a>
             `;
         } else if (booking.booking_status === 'completed') {
             actionButtons.innerHTML += `
-                <a href="submit_rating_review.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
+                <a href="submit_rating_review.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
                     Leave a Review
                 </a>
             `;

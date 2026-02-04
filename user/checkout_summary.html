@@ -351,7 +351,7 @@ document.getElementById('proceedButton').addEventListener('click', async functio
             localStorage.setItem('currentBooking', JSON.stringify(data.data));
             
             // Redirect to payment page
-            window.location.href = `payment_proof_upload.html?booking=${data.data.booking_id}`;
+            window.location.href = `payment_proof_upload.html?booking_id=${data.data.booking_id}`;
         } else {
             alert(data.error || 'Failed to create booking');
             this.disabled = false;
