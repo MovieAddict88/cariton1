@@ -159,12 +159,13 @@
 </nav>
 <script>
 async function loadFeaturedCars() {
+    const container = document.getElementById('featuredCars');
     try {
         const response = await fetch('../api/vehicles.php?featured=1&limit=6');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
 
         if (data.success && data.data) {
-            const container = document.getElementById('featuredCars');
             if (data.data.length === 0) {
                 container.innerHTML = '<p class="col-span-full text-center text-slate-500 py-8">No featured cars at the moment.</p>';
                 return;
@@ -180,9 +181,12 @@ async function loadFeaturedCars() {
                     </div>
                 </div>
             `).join('');
+        } else {
+            throw new Error(data.error || 'Failed to load featured cars');
         }
     } catch (error) {
         console.error('Error loading featured cars:', error);
+        container.innerHTML = '<p class="col-span-full text-center text-red-500 py-8">Unable to load featured cars at this time.</p>';
     }
 }
 

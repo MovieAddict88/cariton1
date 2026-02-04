@@ -248,6 +248,7 @@ async function loadVehicles() {
         document.getElementById('emptyState').style.display = 'none';
         
         const response = await fetch('../api/vehicles.php?status=available&limit=100');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         
         if (data.success && data.data) {
@@ -255,7 +256,7 @@ async function loadVehicles() {
             filteredVehicles = allVehicles;
             renderVehicles();
         } else {
-            showError();
+            throw new Error(data.error || 'Failed to load vehicles');
         }
     } catch (error) {
         console.error('Error loading vehicles:', error);

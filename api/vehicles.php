@@ -44,8 +44,12 @@ try {
     }
     
     if ($featured !== null) {
-        $conditions[] = "is_featured = ?";
-        $params[] = $featured ? 1 : 0;
+        // Check if is_featured column exists to avoid SQL error
+        $checkCol = $pdo->query("SHOW COLUMNS FROM vehicles LIKE 'is_featured'");
+        if ($checkCol->rowCount() > 0) {
+            $conditions[] = "is_featured = ?";
+            $params[] = $featured ? 1 : 0;
+        }
     }
     
     $whereClause = count($conditions) > 0 ? 'WHERE ' . implode(' AND ', $conditions) : '';
@@ -58,11 +62,17 @@ try {
     
     // Get vehicles
     $query = "SELECT * FROM vehicles {$whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?";
-    $params[] = $limit;
-    $params[] = $offset;
     
     $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
+    // Explicitly bind limit and offset as integers for better compatibility
+    $paramIndex = 1;
+    foreach ($params as $param) {
+        $stmt->bindValue($paramIndex++, $param);
+    }
+    $stmt->bindValue($paramIndex++, (int)$limit, PDO::PARAM_INT);
+    $stmt->bindValue($paramIndex++, (int)$offset, PDO::PARAM_INT);
+
+    $stmt->execute();
     $vehicles = $stmt->fetchAll();
     
     // Process vehicles data
