@@ -124,23 +124,15 @@
 <div class="px-4 pt-6 pb-2">
 <h2 class="text-xl font-bold tracking-tight">Featured Cars</h2>
 </div>
-<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4">
-<div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50">
-<div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAF-vwYB5euILEZi-hMgZz6ZBKo409N5kVIuy5DhXsMp16cX9-4NMZoJqJlznmu6rqm_mBfba_G7xMKg3_6bT8LzDVW4iFOB60WOynLgucMsJW5aIFVcZaHnLVfSQTWe5Ztyv-f_N84hjYOeZmaaKjsvaYnL3alUOzEiE158Z1vWmf7bwCp4TkAZ33ab_jYK3KL-kTTwdMKx6LL2QPRt1ktY-a5oAGuRXu0tIpsbWnDI3dgi60lyz5ug5_Wc0IitiIR5wMRVzHXAes7");'></div>
-<div class="p-3">
-<p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">Tesla Model 3</p>
-<p class="text-primary text-sm font-bold mb-2">₱85<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
-<a href="browse_cars.php" class="text-xs font-semibold text-primary">View Details →</a>
-</div>
-</div>
-<div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50">
-<div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmVpvhKhnkFSmQOWEPoxwgfueeAlkGyCtvoQpF0QOvWIljPR5_6bS9JnrW9IwPw5y6uKSASosl7-AZGFbzJg7JF01JsCJHEBMMgP6wX5VzONP1YAsnACTLyBv225d_8cPHKIprD2eCvtFIQ1NoxiL7ztemr66D8SoOvkOT_GrXwHuoP2hHJG9OhIFvGnugdzaHk56Ipx0gEufWcnv043pUBisRQQKFy0uifd0Q9KaaaxoRmkQnEhr3E3TqvTkqdmq5j531PfdWJ5bQ");'></div>
-<div class="p-3">
-<p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">BMW X5</p>
-<p class="text-primary text-sm font-bold mb-2">₱120<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
-<a href="browse_cars.php" class="text-xs font-semibold text-primary">View Details →</a>
-</div>
-</div>
+<div id="featuredCars" class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4">
+    <!-- Loading skeleton -->
+    <div class="animate-pulse flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50">
+        <div class="w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800"></div>
+        <div class="p-3 space-y-2">
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4"></div>
+        </div>
+    </div>
 </div>
 </main>
 <!-- Bottom Navigation Bar -->
@@ -164,5 +156,36 @@
 </a>
 </div>
 </nav>
+<script>
+async function loadFeaturedCars() {
+    try {
+        const response = await fetch('../api/vehicles.php?featured=1&limit=6');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            const container = document.getElementById('featuredCars');
+            if (data.data.length === 0) {
+                container.innerHTML = '<p class="col-span-full text-center text-slate-500 py-8">No featured cars at the moment.</p>';
+                return;
+            }
+
+            container.innerHTML = data.data.map(vehicle => `
+                <div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50 hover:shadow-md transition-shadow">
+                    <div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("${vehicle.display_image}");'></div>
+                    <div class="p-3">
+                        <p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">${vehicle.make} ${vehicle.model}</p>
+                        <p class="text-primary text-sm font-bold mb-2">₱${parseFloat(vehicle.daily_rate).toFixed(2)}<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
+                        <a href="checkout_summary.html?vehicle=${vehicle.id}" class="text-xs font-semibold text-primary">Book Now →</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading featured cars:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadFeaturedCars);
+</script>
 </body>
 </html>

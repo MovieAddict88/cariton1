@@ -20,42 +20,74 @@ require_once '../admin/includes/config.php';
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $user_id = $_GET['user_id'] ?? null;
+        $booking_id = $_GET['booking_id'] ?? null;
         
-        if (!$user_id) {
+        if (!$user_id && !$booking_id) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'User ID is required']);
+            echo json_encode(['success' => false, 'error' => 'User ID or Booking ID is required']);
             exit;
         }
         
         $pdo = getDBConnection();
         
-        $stmt = $pdo->prepare("
-            SELECT b.*, v.make, v.model, v.images, v.vehicle_type, v.plate_number, v.daily_rate,
-                   p.status as payment_status, p.amount as payment_amount, p.payment_method
-            FROM bookings b
-            LEFT JOIN vehicles v ON b.vehicle_id = v.id
-            LEFT JOIN payments p ON b.id = p.booking_id
-            WHERE b.user_id = ?
-            ORDER BY b.created_at DESC
-        ");
-        $stmt->execute([$user_id]);
-        $bookings = $stmt->fetchAll();
-        
-        // Process bookings data
-        foreach ($bookings as &$booking) {
-            $images = json_decode($booking['images'] ?? '[]', true);
-            if (!is_array($images)) {
-                $images = [];
+        if ($booking_id) {
+            $stmt = $pdo->prepare("
+                SELECT b.*, v.make, v.model, v.images, v.vehicle_type, v.plate_number, v.daily_rate,
+                       v.transmission, v.fuel_type, v.seats,
+                       p.status as payment_status, p.amount as payment_amount, p.payment_method, p.transaction_reference
+                FROM bookings b
+                LEFT JOIN vehicles v ON b.vehicle_id = v.id
+                LEFT JOIN payments p ON b.id = p.booking_id
+                WHERE b.id = ?
+            ");
+            $stmt->execute([$booking_id]);
+            $booking = $stmt->fetch();
+
+            if (!$booking) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'error' => 'Booking not found']);
+                exit;
             }
+
+            // Process booking data
+            $images = json_decode($booking['images'] ?? '[]', true);
             $booking['vehicle_image'] = !empty($images) ? $images[0] : 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400';
             $booking['vehicle_name'] = $booking['make'] . ' ' . $booking['model'];
             unset($booking['images']);
+
+            echo json_encode([
+                'success' => true,
+                'data' => $booking
+            ]);
+        } else {
+            $stmt = $pdo->prepare("
+                SELECT b.*, v.make, v.model, v.images, v.vehicle_type, v.plate_number, v.daily_rate,
+                       p.status as payment_status, p.amount as payment_amount, p.payment_method
+                FROM bookings b
+                LEFT JOIN vehicles v ON b.vehicle_id = v.id
+                LEFT JOIN payments p ON b.id = p.booking_id
+                WHERE b.user_id = ?
+                ORDER BY b.created_at DESC
+            ");
+            $stmt->execute([$user_id]);
+            $bookings = $stmt->fetchAll();
+
+            // Process bookings data
+            foreach ($bookings as &$booking) {
+                $images = json_decode($booking['images'] ?? '[]', true);
+                if (!is_array($images)) {
+                    $images = [];
+                }
+                $booking['vehicle_image'] = !empty($images) ? $images[0] : 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400';
+                $booking['vehicle_name'] = $booking['make'] . ' ' . $booking['model'];
+                unset($booking['images']);
+            }
+
+            echo json_encode([
+                'success' => true,
+                'data' => $bookings
+            ]);
         }
-        
-        echo json_encode([
-            'success' => true,
-            'data' => $bookings
-        ]);
         
     } catch (PDOException $e) {
         http_response_code(500);

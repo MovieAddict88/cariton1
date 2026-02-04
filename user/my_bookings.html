@@ -321,9 +321,9 @@ function renderBookings() {
                                 Submit Payment
                             </a>
                         ` : ''}
-                        <button class="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="viewDetails('${booking.reference_number}')">
+                        <a href="booking_details.html?id=${booking.id}" class="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                             View Details
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -335,10 +335,6 @@ function showEmpty() {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('bookingsList').style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
-}
-
-function viewDetails(refNumber) {
-    alert(`Booking Details for ${refNumber}\n\nDetailed view coming soon!`);
 }
 
 // Filter tabs
