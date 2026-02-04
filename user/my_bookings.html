@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Bookings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+              "card-light": "#ffffff",
+              "card-dark": "#192633",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-tab-bar {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+        .skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+    </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+<div class="flex items-center justify-between px-4 py-4">
+<a href="index.html" class="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h1 class="text-lg font-bold flex-1 text-center pr-10">My Bookings</h1>
+</div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto p-4 pb-24">
+<!-- Filter Tabs -->
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+<button class="filter-tab active px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors" data-filter="all">
+All Bookings
+</button>
+<button class="filter-tab px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors" data-filter="pending">
+Pending
+</button>
+<button class="filter-tab px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors" data-filter="confirmed">
+Confirmed
+</button>
+<button class="filter-tab px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors" data-filter="active">
+Active
+</button>
+<button class="filter-tab px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors" data-filter="completed">
+Completed
+</button>
+</div>
+
+<!-- Loading State -->
+<div id="loadingState" class="space-y-4">
+<div class="bg-card-light dark:bg-card-dark rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+<div class="flex gap-4">
+<div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-lg skeleton"></div>
+<div class="flex-1 space-y-2">
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded skeleton w-3/4"></div>
+<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded skeleton w-1/2"></div>
+<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded skeleton w-2/3"></div>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+<div class="flex gap-4">
+<div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-lg skeleton"></div>
+<div class="flex-1 space-y-2">
+<div class="h-4 bg-gray-200 dark:bg-gray-700 rounded skeleton w-3/4"></div>
+<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded skeleton w-1/2"></div>
+<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded skeleton w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Bookings List -->
+<div id="bookingsList" class="space-y-4" style="display: none;">
+<!-- Bookings will be dynamically loaded here -->
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="text-center py-12" style="display: none;">
+<span class="material-symbols-outlined text-6xl text-gray-400 mb-4">event_busy</span>
+<p class="text-gray-500 dark:text-gray-400 text-lg font-medium">No bookings found</p>
+<p class="text-gray-400 dark:text-gray-500 text-sm mt-2">Start browsing cars to make your first booking</p>
+<a href="browse_cars.php" class="inline-block mt-6 px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+Browse Cars
+</a>
+</div>
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 ios-tab-bar">
+<div class="flex justify-around items-center h-20 max-w-7xl mx-auto px-6">
+<a href="index.html" class="flex flex-col items-center justify-center text-gray-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] mt-1 font-medium">Home</span>
+</a>
+<a href="browse_cars.php" class="flex flex-col items-center justify-center text-gray-400">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] mt-1 font-medium">Browse</span>
+</a>
+<a href="my_bookings.html" class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined fill-1">calendar_today</span>
+<span class="text-[10px] mt-1 font-bold">Bookings</span>
+</a>
+<a href="user_authentication.html" class="flex flex-col items-center justify-center text-gray-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] mt-1 font-medium">Profile</span>
+</a>
+</div>
+</nav>
+
+<script>
+// Check if user is logged in
+const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+if (!user) {
+    alert('Please login to view your bookings');
+    window.location.href = 'user_authentication.html';
+}
+
+let allBookings = [];
+let currentFilter = 'all';
+
+// Load bookings
+async function loadBookings() {
+    try {
+        const response = await fetch(`../api/bookings.php?user_id=${user.user_id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            allBookings = data.data;
+            renderBookings();
+        } else {
+            showEmpty();
+        }
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        showEmpty();
+    }
+}
+
+function renderBookings() {
+    document.getElementById('loadingState').style.display = 'none';
+    
+    // Filter bookings
+    let filteredBookings = allBookings;
+    if (currentFilter !== 'all') {
+        filteredBookings = allBookings.filter(b => b.booking_status === currentFilter);
+    }
+    
+    if (filteredBookings.length === 0) {
+        document.getElementById('bookingsList').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+    }
+    
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('bookingsList').style.display = 'block';
+    
+    const bookingsList = document.getElementById('bookingsList');
+    bookingsList.innerHTML = filteredBookings.map(booking => {
+        const statusColors = {
+            'pending': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+            'confirmed': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+            'active': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+            'completed': 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300',
+            'cancelled': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+        };
+        
+        const paymentStatusColors = {
+            'pending': 'text-orange-600 dark:text-orange-400',
+            'verified': 'text-green-600 dark:text-green-400',
+            'rejected': 'text-red-600 dark:text-red-400'
+        };
+        
+        const statusColor = statusColors[booking.booking_status] || statusColors['pending'];
+        const paymentColor = paymentStatusColors[booking.payment_status] || paymentStatusColors['pending'];
+        
+        return `
+            <div class="bg-card-light dark:bg-card-dark rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Booking Reference</p>
+                            <p class="font-bold text-primary">${booking.reference_number}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${statusColor}">
+                            ${booking.booking_status}
+                        </span>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-4">
+                        <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 bg-center bg-cover" style="background-image: url('${booking.vehicle_image}')"></div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-1">${booking.vehicle_name}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">${booking.plate_number}</p>
+                            <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                <span class="material-symbols-outlined text-sm">calendar_today</span>
+                                <span>${new Date(booking.pickup_date).toLocaleDateString()} - ${new Date(booking.dropoff_date).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 mb-3 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Rental Days:</span>
+                            <span class="font-semibold">${booking.rental_days} days</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-400">Total Amount:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">₱${parseFloat(booking.total_amount).toFixed(2)}</span>
+                        </div>
+                        ${booking.payment_status ? `
+                        <div class="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span class="text-gray-600 dark:text-gray-400">Payment Status:</span>
+                            <span class="font-semibold ${paymentColor} capitalize">${booking.payment_status || 'No payment'}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        ${booking.booking_status === 'completed' ? `
+                            <a href="submit_rating_review.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+                                Leave Review
+                            </a>
+                        ` : ''}
+                        ${booking.booking_status === 'pending' && !booking.payment_status ? `
+                            <a href="payment_proof_upload.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+                                Submit Payment
+                            </a>
+                        ` : ''}
+                        <button class="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="viewDetails('${booking.reference_number}')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function showEmpty() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('bookingsList').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+}
+
+function viewDetails(refNumber) {
+    alert(`Booking Details for ${refNumber}\n\nDetailed view coming soon!`);
+}
+
+// Filter tabs
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        currentFilter = this.dataset.filter;
+        
+        // Update active state
+        document.querySelectorAll('.filter-tab').forEach(t => {
+            t.classList.remove('active', 'bg-primary', 'text-white');
+            t.classList.add('bg-gray-200', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+        });
+        
+        this.classList.add('active', 'bg-primary', 'text-white');
+        this.classList.remove('bg-gray-200', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+        
+        renderBookings();
+    });
+});
+
+// Initialize filter tabs styles
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    if (tab.classList.contains('active')) {
+        tab.classList.add('bg-primary', 'text-white');
+    } else {
+        tab.classList.add('bg-gray-200', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
+    }
+});
+
+// Load bookings on page load
+loadBookings();
+</script>
+
+</body></html>

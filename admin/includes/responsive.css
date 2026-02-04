@@ -1,0 +1,90 @@
+/* Shared responsive enhancements for the Admin Panel (PHP pages)
+   - Targets charts/graphs, containers, and ultra-small/ultra-large devices.
+*/
+
+:root {
+  /* Default (very small devices / smart watches) */
+  --base-font-size: clamp(12px, 3vw, 16px);
+  --page-padding: clamp(0.5rem, 2vw, 2rem);
+  --content-max-width: clamp(280px, 100vw, 1920px);
+
+  /* Charts */
+  --chart-height-sm: clamp(160px, 26vh, 240px);
+  --chart-height-md: clamp(220px, 32vh, 340px);
+  --chart-height-lg: clamp(260px, 36vh, 420px);
+}
+
+html {
+  font-size: var(--base-font-size);
+}
+
+/* Progressive font scaling */
+@media (min-width: 640px) {
+  :root {
+    --base-font-size: clamp(14px, 2vw, 16px);
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --base-font-size: clamp(15px, 1.2vw, 18px);
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --base-font-size: clamp(16px, 1vw, 20px);
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --base-font-size: clamp(18px, 0.8vw, 24px);
+  }
+}
+
+/* Center content on huge screens while keeping full-width behavior on small screens */
+.admin-content {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+}
+
+/* Safer overflow on narrow devices */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Chart wrappers prevent "unlimited" scaling and keep consistent aspect across devices */
+.chart-card {
+  width: 100%;
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  min-height: var(--chart-height-sm);
+  max-height: 70vh;
+}
+
+@media (min-width: 768px) {
+  .chart-wrap {
+    min-height: var(--chart-height-md);
+  }
+}
+
+@media (min-width: 1920px) {
+  .chart-wrap {
+    min-height: var(--chart-height-lg);
+  }
+}
+
+.chart-wrap canvas,
+.chart-wrap svg {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+

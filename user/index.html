@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VeloDrive - Car Rental</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+                colors: {
+                    "primary": "#137fec",
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#101922",
+                },
+                fontFamily: {
+                    "display": ["Inter"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<style>
+    .glass-effect { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    body { font-family: 'Inter', sans-serif; min-height: max(884px, 100dvh); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen pb-24">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center p-4 justify-between max-w-7xl mx-auto">
+<div class="flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined cursor-pointer">menu</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center">VeloDrive</h2>
+<div class="flex w-10 items-center justify-end">
+<a href="user_authentication.html" class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined">account_circle</span>
+</a>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto">
+<!-- Welcome Section -->
+<div class="px-4 py-6">
+<h1 class="text-2xl font-bold tracking-tight">Welcome Back!</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Find your perfect ride today</p>
+</div>
+<!-- Quick Actions -->
+<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 px-4">
+<a href="browse_cars.php" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#192633] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-primary flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-white">directions_car</span>
+</div>
+<span class="text-sm font-bold">Browse Cars</span>
+</a>
+<a href="my_bookings.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#192633] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary">confirmation_number</span>
+</div>
+<span class="text-sm font-bold">My Bookings</span>
+</a>
+</div>
+<!-- Featured Cars -->
+<div class="px-4 pt-6 pb-2">
+<h2 class="text-xl font-bold tracking-tight">Featured Cars</h2>
+</div>
+<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4">
+<div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50">
+<div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAF-vwYB5euILEZi-hMgZz6ZBKo409N5kVIuy5DhXsMp16cX9-4NMZoJqJlznmu6rqm_mBfba_G7xMKg3_6bT8LzDVW4iFOB60WOynLgucMsJW5aIFVcZaHnLVfSQTWe5Ztyv-f_N84hjYOeZmaaKjsvaYnL3alUOzEiE158Z1vWmf7bwCp4TkAZ33ab_jYK3KL-kTTwdMKx6LL2QPRt1ktY-a5oAGuRXu0tIpsbWnDI3dgi60lyz5ug5_Wc0IitiIR5wMRVzHXAes7");'></div>
+<div class="p-3">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">Tesla Model 3</p>
+<p class="text-primary text-sm font-bold mb-2">₱85<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
+<a href="browse_cars.php" class="text-xs font-semibold text-primary">View Details →</a>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50">
+<div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmVpvhKhnkFSmQOWEPoxwgfueeAlkGyCtvoQpF0QOvWIljPR5_6bS9JnrW9IwPw5y6uKSASosl7-AZGFbzJg7JF01JsCJHEBMMgP6wX5VzONP1YAsnACTLyBv225d_8cPHKIprD2eCvtFIQ1NoxiL7ztemr66D8SoOvkOT_GrXwHuoP2hHJG9OhIFvGnugdzaHk56Ipx0gEufWcnv043pUBisRQQKFy0uifd0Q9KaaaxoRmkQnEhr3E3TqvTkqdmq5j531PfdWJ5bQ");'></div>
+<div class="p-3">
+<p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">BMW X5</p>
+<p class="text-primary text-sm font-bold mb-2">₱120<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
+<a href="browse_cars.php" class="text-xs font-semibold text-primary">View Details →</a>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 pb-safe">
+<div class="flex justify-around items-center h-20 max-w-7xl mx-auto px-6">
+<a href="index.html" class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] mt-1 font-bold">Home</span>
+</a>
+<a href="browse_cars.php" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] mt-1 font-medium">Browse</span>
+</a>
+<a href="my_bookings.html" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] mt-1 font-medium">Bookings</span>
+</a>
+<a href="user_authentication.html" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] mt-1 font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</body>
+</html>

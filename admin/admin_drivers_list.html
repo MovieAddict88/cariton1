@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Drivers List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .ios-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+    </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-50 glass-header bg-background-light/80 dark:bg-background-dark/80 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center px-4 h-16 justify-between">
+<a href="index.html" class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary cursor-pointer">arrow_back_ios</span>
+</a>
+<h1 class="text-xl font-bold tracking-tight">Drivers</h1>
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pb-24">
+<!-- Search Bar -->
+<div class="px-4 py-4">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-slate-400 flex border-none bg-white dark:bg-[#1c2a3a] items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-white dark:bg-[#1c2a3a] text-slate-900 dark:text-white focus:ring-0 h-full placeholder:text-slate-400 px-4 rounded-r-xl text-base font-normal leading-normal" placeholder="Search drivers by name or license" type="text"/>
+</div>
+</label>
+</div>
+<!-- Stats Section -->
+<div class="flex gap-4 px-4 mb-4">
+<div class="flex-1 bg-white dark:bg-[#1c2a3a] rounded-xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Drivers</p>
+<p class="text-2xl font-bold mt-1">24</p>
+</div>
+<div class="flex-1 bg-white dark:bg-[#1c2a3a] rounded-xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Expired</p>
+<div class="flex items-center gap-2">
+<p class="text-2xl font-bold mt-1 text-red-500">2</p>
+<span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">CRITICAL</span>
+</div>
+</div>
+</div>
+<!-- List Header -->
+<div class="px-4 py-2 flex items-center justify-between">
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Registered Personnel</h3>
+</div>
+<!-- Drivers List -->
+<div class="flex flex-col divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Driver 1: Active -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark/50 px-4 py-4 justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary/20" data-alt="Professional portrait of a male driver smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBSaN8i-GFWTS4esBeWsYsCFSG9jygGMgTlQDGkWlg_zERtQ58Cr_3WMDTdC64pAs9aPqQrtMyVjI0Ts3luMUcXVVI4UKQfry-Z7g-g7EY25IqY5biv4oo6OI45j0DBXaIjUMVfHLlPDgH_xs2oveZnCsw4HMtoEhSDGso7Nchy_iZKtBNl55InHewbdjbXHEBYMy6Fj7ZDiVObQvvw2c4wi-QfGVtkLsrMTyImkGFZFS7bQwXtpxT4UFCu9eJuw2MHHbw5CkkiryDa");'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-semibold text-base">Johnathan Doe</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Lic: #TX-882190 • Truck B-42</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 text-[11px] font-bold bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded uppercase">Active</span>
+<div class="flex gap-1">
+<a href="admin_driver_profile_details.html" class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</a>
+<button class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Driver 2: Expired -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark/50 px-4 py-4 justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-red-500/20" data-alt="Professional portrait of a female driver" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAjURExr8fPtPiydWY0WofNjCVzO8J_Qv2QdKU2iaRpl8fafzN26IIcJDob8AcLMFfuFGdwd5Ku35Ps5E6QTwV-cQ6RiMwR7mINPnU5Cb1qH1SSBtz-_0cGMRx79W0z-2fYathZbM0rYRgdbfgM8qVQHhHDPLIFYH94SC0SLZvaeSL5_5DO75X-aXauT_NWPKwFLxVAcFBp12T7oIP-RoVQGD1Yd7xzRTfKolg8oM_1Pwg1Qq9XWMz6R2vDSJ2LD0vik8D_8hEWuP2J");'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-semibold text-base">Sarah Jenkins</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs text-red-500/80 font-medium">Lic: #NY-441203 • Expired 2d ago</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 text-[11px] font-bold bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded uppercase">Expired</span>
+<div class="flex gap-1">
+<a href="admin_driver_profile_details.html" class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</a>
+<button class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Driver 3: Active -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark/50 px-4 py-4 justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary/20" data-alt="Portrait of a middle aged male driver" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBw_tY5PRH2AFlbZ9X7gZxQtImWRWkw9UZLlAqqzhRvV95seMr-4M-V18zuOTOWHkHOwbFR2oVDankAdLBzHZVPAdZm8ooinCtCj029La-o0AKh3YXFxJfJXh1M-WTx-ffySbTAtuNUT7v1TfW-JnF236KzWcscczYGaRZtfNqTajEWVVOavb8s4yt_Et7JMSwgIRMFcHQkhmFswbhnlv-_Y1vzrU2Wdd416LpSkk3-yhMybanjbqKc_s4xafB2-5zpmq_vPTYC4p9b");'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-semibold text-base">Michael Chen</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Lic: #CA-993011 • Van V-09</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 text-[11px] font-bold bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded uppercase">Active</span>
+<div class="flex gap-1">
+<a href="admin_driver_profile_details.html" class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</a>
+<button class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Driver 4: Active -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark/50 px-4 py-4 justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary/20" data-alt="Portrait of a driver with sunglasses" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD5uxCyzXh4yjYoesT4FQYnIOaRmIQuTkaUsMcLb6oEKT2VPCC6bjoHaDQZGPKPXWvImA_CAUXIo5BB4c860NTWIiYk7imZEfQRnB93oVWI5LcqIHk1FtXTNOdGcviPK-tJnIPtOUmsfMvxjaopheZmTqZ5CoN-frxeMIReZlT3Hrdiv5BQ5DOnjJkJxql1Ej-VmjoY9pasP4hIHHcJeGH7ifZdLHtgvSlztrGVKOujZBOfhXEM83dgy1s222k61IlQcJMia-cQanck");'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-semibold text-base">Robert Wilson</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Lic: #FL-221098 • Sedan S-15</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 text-[11px] font-bold bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded uppercase">Active</span>
+<div class="flex gap-1">
+<a href="admin_driver_profile_details.html" class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</a>
+<button class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Driver 5: Expired -->
+<div class="flex items-center gap-4 bg-white dark:bg-background-dark/50 px-4 py-4 justify-between group">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-red-500/20" data-alt="Portrait of a young woman driver" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDu_9y-BsHmr3KcX8l633MTWc3sc2Q4elB19z_9Ka0rxMAXBVbtNWatM_XOi7IONNYkDhBrxD6GIdyHGmEQv9F0_GPCdMW3lWm1KDYCjNA-Teq9zkB-Ou01hbFPfOoRIAOpo4LOLSLFJht96wae_FnCg8WGUFiAOF3X7Ht_C_OfJm0uKsz1fP0vFCHBlI4TfL2Al2tDnmYh4xAV8kG-ea8scwhHX9HHGBNCSF_AcX5fYRMt0d4bBwOty0LBJcfddXfJ5-ZLc9E6e6V3");'>
+</div>
+<div class="flex flex-col justify-center">
+<p class="font-semibold text-base">Elena Rodriguez</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs text-red-500/80 font-medium">Lic: #TX-771223 • Expired today</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-2 py-1 text-[11px] font-bold bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded uppercase">Expired</span>
+<div class="flex gap-1">
+<a href="admin_driver_profile_details.html" class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</a>
+<button class="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6">
+<button class="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full ios-shadow active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 pt-3 pb-8 flex justify-between items-center z-40">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="index.html">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="fleet_management.html">
+<span class="material-symbols-outlined">garage</span>
+<span class="text-[10px] font-medium">Fleet</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="admin_drivers_list.html">
+<span class="material-symbols-outlined fill-1">group</span>
+<span class="text-[10px] font-bold">Drivers</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="admin_payment_approvals.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-medium">Payments</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="admin_review_management.html">
+<span class="material-symbols-outlined">reviews</span>
+<span class="text-[10px] font-medium">Reviews</span>
+</a>
+</nav>
+<!-- iOS Home Indicator Spacing -->
+<div class="h-8 bg-background-light dark:bg-background-dark"></div>
+</body></html>

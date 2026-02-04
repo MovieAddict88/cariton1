@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-dark": "#1c2632",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+    </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
+<!-- Sidebar / Drawer Overlay (Hidden by default) -->
+<div class="fixed inset-0 bg-black/50 z-40 hidden" id="drawer-overlay"></div>
+<!-- Drawer Sidebar -->
+<div class="fixed top-0 left-0 h-full w-72 bg-white dark:bg-surface-dark z-50 transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800" id="sidebar">
+<div class="flex items-center justify-between p-6">
+<div class="flex items-center gap-3">
+<div class="bg-primary size-10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white">directions_car</span>
+</div>
+<span class="font-bold text-xl tracking-tight">DriveAdmin</span>
+</div>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="mt-4 px-4 space-y-2">
+<a class="flex items-center gap-4 p-3 bg-primary/10 text-primary rounded-lg font-medium" href="index.html">
+<span class="material-symbols-outlined">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center gap-4 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="fleet_management.html">
+<span class="material-symbols-outlined">garage</span>
+                Fleet Management
+            </a>
+<a class="flex items-center gap-4 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="admin_drivers_list.html">
+<span class="material-symbols-outlined">group</span>
+                Drivers
+            </a>
+<a class="flex items-center gap-4 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="admin_payment_approvals.html">
+<span class="material-symbols-outlined">payments</span>
+                Payments
+            </a>
+<a class="flex items-center gap-4 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="admin_review_management.html">
+<span class="material-symbols-outlined">reviews</span>
+                Reviews
+            </a>
+<div class="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-4 p-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="index.php">
+<span class="material-symbols-outlined">settings</span>
+                    Switch to PHP (Fullstack)
+                </a>
+<a class="flex items-center gap-4 p-3 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" href="logout.php">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</div>
+</nav>
+</div>
+<!-- Main Content Wrapper -->
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-30 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-slate-200 dark:border-slate-800">
+<button class="text-slate-900 dark:text-white flex size-10 items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Dashboard Overview</h2>
+<div class="size-10 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="Admin user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmsT2sTHDS1j0KMwGPRxO2c4gPibeCUgI6s3zUBfImE7mpbMdC4clOfUIecBG0xh1h2c_jRzE25lx12rIFbQTbS1k3W27YxKXjGGBU5XHwZx0NGX9QgeZac5lT3Kko6o2MLLcuLD3qFjMhos5e3hYo-scXfjHY6Zv6moZxSjVV-nEUzwRh2MNJj7zR7ld2p6rIrmDm8s5kJnEsyLsJe-uhAY_LAIOA9lKm6ipyJ12DU64yzHqd_3uCkYITEIEFsfP5fFGWwD2GD7JD"/>
+</div>
+</header>
+<!-- Main Dashboard Content -->
+<main class="flex-1 pb-24">
+<!-- Welcome Section -->
+<div class="px-4 pt-6 pb-2">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Good morning, Alex</p>
+<h1 class="text-2xl font-bold dark:text-white">System Status</h1>
+</div>
+<!-- Stats Section (Horizontal Scroll on Mobile) -->
+<div class="flex overflow-x-auto gap-3 sm:gap-4 p-3 sm:p-4 no-scrollbar md:grid md:grid-cols-3 md:overflow-visible lg:px-0">
+<!-- Revenue -->
+<div class="flex min-w-[280px] flex-col gap-2 rounded-xl p-6 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Revenue</p>
+<div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+</div>
+<p class="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">₱2,450,000</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-500 text-sm">trending_up</span>
+<p class="text-emerald-500 text-sm font-bold">+12.5% <span class="text-slate-400 dark:text-slate-500 font-normal">vs last month</span></p>
+</div>
+</div>
+<!-- Active Rentals -->
+<div class="flex min-w-[280px] flex-col gap-2 rounded-xl p-6 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Rentals</p>
+<div class="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-500 text-sm">key</span>
+</div>
+</div>
+<p class="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">124</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-emerald-500 text-sm">trending_up</span>
+<p class="text-emerald-500 text-sm font-bold">+5.2% <span class="text-slate-400 dark:text-slate-500 font-normal">this week</span></p>
+</div>
+</div>
+<!-- Pending -->
+<div class="flex min-w-[280px] flex-col gap-2 rounded-xl p-6 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pending Approvals</p>
+<div class="size-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-orange-500 text-sm">pending_actions</span>
+</div>
+</div>
+<p class="text-slate-900 dark:text-white tracking-tight text-3xl font-bold leading-tight">8</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-orange-500 text-sm">notification_important</span>
+<p class="text-orange-500 text-sm font-bold">Requires Action</p>
+</div>
+</div>
+</div>
+<!-- Rental Trends Chart Section -->
+<div class="px-4 py-2">
+    <div class="bg-white dark:bg-surface-dark rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <div>
+                <h2 class="text-slate-900 dark:text-white text-base sm:text-lg font-bold leading-tight tracking-[-0.015em]">Rental Trends</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xs">Daily bookings volume</p>
+            </div>
+            <select class="bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs font-bold px-3 py-1.5 focus:ring-2 focus:ring-primary outline-none">
+                <option>Last 7 Days</option>
+                <option>Last 30 Days</option>
+            </select>
+        </div>
+        <div class="flex flex-col gap-2">
+            <p class="text-slate-900 dark:text-white tracking-light text-2xl sm:text-3xl font-bold leading-tight">1,240</p>
+            <div class="flex flex-wrap gap-1 mb-3 sm:mb-4">
+                <p class="text-slate-400 dark:text-[#92adc9] text-xs sm:text-sm font-normal leading-normal">Total transactions</p>
+                <p class="text-emerald-500 text-xs sm:text-sm font-bold leading-normal">+8.4%</p>
+            </div>
+            <div class="relative w-full" style="height: clamp(140px, 24vh, 240px); min-height: 140px; max-height: 50vh;">
+                <svg class="absolute inset-0 w-full h-full" data-responsive-chart preserveAspectRatio="none" viewBox="-3 0 478 150" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z" fill="url(#paint0_linear)"></path>
+                    <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" fill="none" stroke="#137fec" stroke-linecap="round" stroke-width="3"></path>
+                    <defs>
+                        <linearGradient gradientUnits="userSpaceOnUse" id="paint0_linear" x1="236" x2="236" y1="1" y2="149">
+                            <stop stop-color="#137fec" stop-opacity="0.2"></stop>
+                            <stop offset="1" stop-color="#137fec" stop-opacity="0"></stop>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="flex justify-between px-1 sm:px-2 mt-2 overflow-x-auto no-scrollbar">
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">MON</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">TUE</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider text-primary">WED</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">THU</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">FRI</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">SAT</p>
+                <p class="text-slate-400 text-[10px] sm:text-[11px] font-bold tracking-wider">SUN</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Quick Actions SectionHeader -->
+<div class="px-4 pt-6 pb-4">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Quick Actions</h2>
+</div>
+<!-- Quick Action Grid -->
+<div class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 px-4">
+<a href="fleet_management.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-primary flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-white">add_circle</span>
+</div>
+<span class="text-sm font-bold">New Booking</span>
+</a>
+<a href="fleet_management.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary">directions_car</span>
+</div>
+<span class="text-sm font-bold">Add Vehicle</span>
+</a>
+<a href="admin_drivers_list.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary">person_add</span>
+</div>
+<span class="text-sm font-bold">Add Driver</span>
+</a>
+<a href="admin_payment_approvals.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary">file_download</span>
+</div>
+<span class="text-sm font-bold">Get Report</span>
+</a>
+</div>
+<!-- Recent Notifications / Alerts -->
+<div class="px-4 pt-8 pb-4 flex items-center justify-between">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold">Pending Approvals</h2>
+<a href="admin_payment_approvals.html" class="text-primary text-sm font-bold">View All</a>
+</div>
+<div class="px-4 space-y-3">
+<div class="flex items-center gap-4 p-4 bg-white dark:bg-surface-dark rounded-xl border-l-4 border-orange-500 shadow-sm">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Luxury sedan rental car" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApYQ__NzCKSj3xG-npe4hC5ZheylW88ovpbIztKuhUu_XwViOa5yYsdC-u-ZxiF3WtKY4bJNj7snIaiZTQ_1xRCFa3scrneENP_1fIHRQuBW8qAocZWIcTB4IyOmhIZnkhiG8PmPpPRWLWjz89LVl2iNqxpv_sCEsvorialqve8Zw8vDOxjGix2Xfz5AKLvwsjBrsJcu_5zJzhGBkIz_xH4tfae-wQsLb54B6Skq41diZMbgb2PGBqprqLS5LRgtquhI2hjtv-IvZo"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Tesla Model 3 - Premium</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Request by Marcus K.</p>
+</div>
+<button class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-lg">Approve</button>
+</div>
+<div class="flex items-center gap-4 p-4 bg-white dark:bg-surface-dark rounded-xl border-l-4 border-orange-500 shadow-sm">
+<div class="size-12 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="White SUV car" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg699l8Y_haZ_Wfif70eVw8elP-vJ0dlDgDQ_njr6KNPs7CCFiq2xkl7IfEgToK4vk9kpGh8_UbMdafQdKOegdSQQ6LlXKkukuDrQEOztmynYOYchNFwKTKPLtBGR7Ae0fDVreuOyoumtThBYJtitWIw5x3ADo7NWy0TqjfItbp6NqCTO70z0Tz8UMHsqM1TAau7hw3Q2RqIIMf-geAxe0RnGbH-POouIJIb8ghOjs-DiuuNUPyfokzD_ut7_wdCxfTE9v3FZvexJj"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">BMW X5 - Full Package</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Request by Sarah J.</p>
+</div>
+<button class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-lg">Approve</button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 pt-3 pb-8 flex justify-between items-center z-40">
+<a class="flex flex-col items-center gap-1 text-primary" href="index.html">
+<span class="material-symbols-outlined font-bold">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="fleet_management.html">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Fleet</span>
+</a>
+<div class="-mt-12 bg-primary size-14 rounded-full flex items-center justify-center shadow-lg shadow-primary/40 border-4 border-background-light dark:border-background-dark active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl">add</span>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="admin_payment_approvals.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Pay</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="admin_drivers_list.html">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Drivers</span>
+</a>
+</nav>
+</div>
+<script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('drawer-overlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('drawer-overlay').addEventListener('click', toggleSidebar);
+    </script>
+</body></html>

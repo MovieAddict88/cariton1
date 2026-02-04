@@ -1,0 +1,227 @@
+<?php
+/**
+ * Drivers Management - Admin Page
+ */
+
+$page_title = 'Drivers';
+require_once 'includes/header.php';
+
+$message = '';
+$error = '';
+
+try {
+    $pdo = getDBConnection();
+    
+    // Handle form submissions
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['add_driver'])) {
+            $stmt = $pdo->prepare("INSERT INTO drivers (first_name, last_name, email, phone, license_number, employee_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $_POST['first_name'], $_POST['last_name'], $_POST['email'], 
+                $_POST['phone'], $_POST['license_number'], $_POST['employee_id'], 
+                $_POST['status'] ?? 'active'
+            ]);
+            $message = 'Driver added successfully!';
+        } elseif (isset($_POST['update_status'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET status = ? WHERE id = ?");
+            $stmt->execute([$_POST['status'], $_POST['driver_id']]);
+            $message = 'Driver status updated!';
+        } elseif (isset($_POST['delete_driver'])) {
+            $stmt = $pdo->prepare("DELETE FROM drivers WHERE id = ?");
+            $stmt->execute([$_POST['driver_id']]);
+            $message = 'Driver deleted!';
+        }
+    }
+
+    // Get drivers
+    $stmt = $pdo->query("SELECT d.*, v.make, v.model FROM drivers d LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id ORDER BY d.created_at DESC");
+    $drivers = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    $drivers = [];
+    $error = "Database error: " . $e->getMessage();
+}
+?>
+
+<div class="flex h-screen overflow-hidden">
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="sticky top-0 z-30 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-slate-200 dark:border-slate-800 lg:px-8">
+            <div class="flex items-center gap-4">
+                <button class="text-slate-900 dark:text-white flex size-10 items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full lg:hidden" onclick="toggleSidebar()">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Driver Roster</h2>
+            </div>
+            <button onclick="document.getElementById('addDriverModal').classList.remove('hidden')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                <span class="material-symbols-outlined">person_add</span>
+                <span class="hidden sm:inline">Add Driver</span>
+            </button>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 admin-content">
+            <?php if ($message): ?>
+                <div class="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <?php if (empty($drivers)): ?>
+                    <!-- Mock drivers if DB is empty -->
+                    <?php 
+                    $mock_drivers = [
+                        ['id' => 1, 'first_name' => 'Johnathan', 'last_name' => 'Doe', 'employee_id' => 'DRV-001', 'status' => 'active', 'phone' => '+63 912 345 6789', 'rating' => 4.8],
+                        ['id' => 2, 'first_name' => 'Sarah', 'last_name' => 'Jenkins', 'employee_id' => 'DRV-002', 'status' => 'active', 'phone' => '+63 912 345 6789', 'rating' => 4.9],
+                        ['id' => 3, 'first_name' => 'Michael', 'last_name' => 'Chen', 'employee_id' => 'DRV-003', 'status' => 'on_leave', 'phone' => '+63 912 345 6789', 'rating' => 4.7],
+                    ];
+                    foreach($mock_drivers as $d): ?>
+                        <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="size-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center overflow-hidden">
+                                    <img src="https://ui-avatars.com/api/?name=<?= $d['first_name'] ?>+<?= $d['last_name'] ?>&background=random" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg"><?= $d['first_name'] . ' ' . $d['last_name'] ?></h3>
+                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider"><?= $d['employee_id'] ?></p>
+                                </div>
+                            </div>
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-500">Status</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase <?= $d['status'] == 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' ?>">
+                                        <?= $d['status'] ?>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-500">Phone</span>
+                                    <span class="font-medium"><?= $d['phone'] ?></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-500">Rating</span>
+                                    <div class="flex items-center gap-1 text-amber-500 font-bold">
+                                        <span class="material-symbols-outlined text-sm fill-1">star</span>
+                                        <?= $d['rating'] ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-4">
+                                <a href="driver_details.php?id=<?= $d['id'] ?>" class="flex-1 bg-slate-100 dark:bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">Details</a>
+                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors">Assign</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($drivers as $d): ?>
+                        <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="size-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center overflow-hidden">
+                                    <img src="https://ui-avatars.com/api/?name=<?= $d['first_name'] ?>+<?= $d['last_name'] ?>&background=random" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg"><?= htmlspecialchars($d['first_name'] . ' ' . $d['last_name']) ?></h3>
+                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider"><?= $d['employee_id'] ?></p>
+                                </div>
+                            </div>
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-500">Status</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase <?= $d['status'] == 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' ?>">
+                                        <?= $d['status'] ?>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-500">Assigned</span>
+                                    <span class="font-medium text-xs"><?= $d['make'] ? ($d['make'] . ' ' . $d['model']) : 'Unassigned' ?></span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <form method="POST" class="flex-1">
+                                    <input type="hidden" name="driver_id" value="<?= $d['id'] ?>">
+                                    <input type="hidden" name="update_status" value="1">
+                                    <select name="status" onchange="this.form.submit()" class="w-full text-xs font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900">
+                                        <option value="active" <?= $d['status'] === 'active' ? 'selected' : '' ?>>Active</option>
+                                        <option value="inactive" <?= $d['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                                        <option value="on_leave" <?= $d['status'] === 'on_leave' ? 'selected' : '' ?>>On Leave</option>
+                                    </select>
+                                </form>
+                                <a href="driver_details.php?id=<?= $d['id'] ?>" class="p-2 text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </a>
+                                <form method="POST" onsubmit="return confirm('Delete this driver?');" class="inline">
+                                    <input type="hidden" name="driver_id" value="<?= $d['id'] ?>">
+                                    <button type="submit" name="delete_driver" class="p-2 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add Driver Modal -->
+<div id="addDriverModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-surface-dark rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+            <h3 class="text-lg font-bold">Add New Driver</h3>
+            <button onclick="document.getElementById('addDriverModal').classList.add('hidden')" class="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form method="POST" class="p-6 space-y-4 max-h-[70vh] overflow-y-auto no-scrollbar">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">First Name</label>
+                    <input type="text" name="first_name" required placeholder="John" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Last Name</label>
+                    <input type="text" name="last_name" required placeholder="Doe" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+                    <input type="email" name="email" required placeholder="john.doe@example.com" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Phone</label>
+                    <input type="tel" name="phone" required placeholder="+63 912 345 6789" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">License Number</label>
+                    <input type="text" name="license_number" required placeholder="D01-123456789" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee ID</label>
+                    <input type="text" name="employee_id" required placeholder="DRV-001" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Status</label>
+                <select name="status" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="on_leave">On Leave</option>
+                </select>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="document.getElementById('addDriverModal').classList.add('hidden')" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" name="add_driver" class="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
+                    Add Driver
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>

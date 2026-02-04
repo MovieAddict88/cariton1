@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Review Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-star {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+    </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased">
+<!-- iOS Status Bar Placeholder -->
+<div class="h-12 w-full bg-background-light dark:bg-background-dark flex items-center justify-between px-6 sticky top-0 z-50">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[18px]">wifi</span>
+<span class="material-symbols-outlined text-[18px]">battery_full</span>
+</div>
+</div>
+<!-- Top Navigation Bar -->
+<header class="sticky top-12 z-40 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center p-4 justify-between">
+<a href="index.html" class="text-primary flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</a>
+<h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center">Review Management</h2>
+<div class="flex size-10 items-center justify-end">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">search</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex flex-col pb-24">
+<!-- Stats Section -->
+<section class="p-4">
+<div class="flex gap-4">
+<div class="flex-1 flex flex-col gap-1 rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Average Rating</p>
+<div class="flex items-end gap-2">
+<p class="text-3xl font-bold leading-none">4.8</p>
+<p class="text-emerald-500 text-sm font-medium mb-0.5 flex items-center">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                            +0.2
+                        </p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1 rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Total Reviews</p>
+<div class="flex items-end gap-2">
+<p class="text-3xl font-bold leading-none">1,284</p>
+<p class="text-primary text-sm font-medium mb-0.5">Jan</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Filter Chips -->
+<section class="px-4 pb-2">
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-5 text-white shadow-lg shadow-primary/20">
+<p class="text-sm font-semibold">Recent</p>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-200 dark:bg-slate-800 px-5 text-slate-700 dark:text-slate-300">
+<p class="text-sm font-medium">Highest Rated</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-200 dark:bg-slate-800 px-5 text-slate-700 dark:text-slate-300">
+<p class="text-sm font-medium">Lowest Rated</p>
+</button>
+</div>
+</section>
+<!-- Section Header -->
+<div class="px-4 pt-4">
+<h3 class="text-lg font-bold">Customer Feedback</h3>
+</div>
+<!-- Reviews List -->
+<section class="flex flex-col gap-4 p-4">
+<!-- Review 1 -->
+<div class="flex flex-col gap-4 p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-slate-200 dark:bg-slate-700 aspect-square bg-cover rounded-full size-12" data-alt="Professional headshot of a smiling man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCF1i_h5OS6znMx3raKpfYgt5P0oEtW9aB-pVQDHRzRDf6ENo2qs_MvnT0hL9vezC7A132bF7Y4bJYBrWyBKQd_ZQAUNMYpUf8vz3duF7A4uGFc0NNI6ie4uA6WF3vO64liGvdkj8n9kOE-PM-Qh5SX47f2cL46_0DnGZKs15PyqeB3C3B9rTWilu5B_oTD4G-fzLgSxndS0QlSYNr1VU8VpgAp8ZRLvMFnmOyT5sX3SAxjXb9V-a_GPX6Z1pxIi5fRmGKpXQOvyQPt");'></div>
+<div class="flex flex-col">
+<p class="text-base font-bold">John Doe</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">2 hours ago</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-star">star</span>
+<span class="material-symbols-outlined text-[18px] fill-star">star</span>
+<span class="material-symbols-outlined text-[18px] fill-star">star</span>
+<span class="material-symbols-outlined text-[18px] fill-star">star</span>
+<span class="material-symbols-outlined text-[18px] fill-star">star</span>
+</div>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Verified Trip</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-slate-500">directions_car</span>
+<span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Tesla Model 3</span>
+</div>
+<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-slate-500">person</span>
+<span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Driver: David W.</span>
+</div>
+</div>
+<p class="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed">
+                    The Tesla Model 3 was in pristine condition. Driver David was very professional and punctual. Highly recommend!
+                </p>
+<div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/50">
+<div class="flex gap-4 text-slate-500">
+<button class="flex items-center gap-1.5 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">thumb_up</span>
+<span class="text-xs font-medium">12</span>
+</button>
+<button class="flex items-center gap-1.5 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">thumb_down</span>
+</button>
+</div>
+<button class="text-xs font-semibold text-primary">Reply as Admin</button>
+</div>
+</div>
+<!-- Review 2 -->
+<div class="flex flex-col gap-4 p-4 rounded-xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-slate-200 dark:bg-slate-700 aspect-square bg-cover rounded-full size-12" data-alt="Portrait of a woman with glasses" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB-zfQaPWp48FgE4ZUHb7FytAZdbD7_Ep5JxEMmUE-4lAdHDHsPeIMHRgHgGo8txhPJ7QxFxhYstxsEEVPtqwVzm_1ApjWakGTf6kIoh0t6yg5mkfAjdmBpYvKeWtkCDwgGe6bKsZ0P1VjoeG5Mz2KM6igkdx6uaa4c_p4CfQnUt7KpvQi0szlqZ09KdTnH945Kuqf840Vptzgb8WP7ofZgILaMlVTZ94hchjuf7n6bSFP9L2bPmtI-60HBQoFgqTw4veqOITByEXKo");'></div>
+<div class="flex flex-col">
+<p class="text-base font-bold">Sarah Miller</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Yesterday</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex gap-0.5">
+<span class="material-symbols-outlined text-[18px] text-primary fill-star">star</span>
+<span class="material-symbols-outlined text-[18px] text-slate-300 dark:text-slate-700">star</span>
+<span class="material-symbols-outlined text-[18px] text-slate-300 dark:text-slate-700">star</span>
+<span class="material-symbols-outlined text-[18px] text-slate-300 dark:text-slate-700">star</span>
+<span class="material-symbols-outlined text-[18px] text-slate-300 dark:text-slate-700">star</span>
+</div>
+<span class="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Action Required</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-slate-500">directions_car</span>
+<span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Toyota Camry</span>
+</div>
+<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-slate-500">person</span>
+<span class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Driver: James K.</span>
+</div>
+</div>
+<p class="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed">
+                    Vehicle: Toyota Camry. Driver: James. The car had a strange smell and the driver was 15 minutes late to the pickup point. Very disappointed with the service this time.
+                </p>
+<div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/50">
+<div class="flex gap-4 text-slate-500">
+<button class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]">thumb_up</span>
+<span class="text-xs font-medium">4</span>
+</button>
+<button class="flex items-center gap-1.5 text-red-500">
+<span class="material-symbols-outlined text-[20px] fill-star">thumb_down</span>
+<span class="text-xs font-medium">1</span>
+</button>
+</div>
+<button class="text-xs font-semibold text-primary">Assign Support</button>
+</div>
+</div>
+</section>
+<!-- Load More Indicator -->
+<div class="flex justify-center py-6">
+<div class="animate-pulse flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-sm">sync</span>
+<span class="text-xs font-medium">Loading more reviews...</span>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 px-6 pt-3 pb-8 flex justify-between items-center z-50">
+<a href="index.html" class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a href="fleet_management.html" class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">garage</span>
+<span class="text-[10px] font-medium">Fleet</span>
+</a>
+<a href="admin_drivers_list.html" class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">Drivers</span>
+</a>
+<a href="admin_payment_approvals.html" class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-medium">Payments</span>
+</a>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined fill-star">reviews</span>
+<span class="text-[10px] font-medium font-bold">Reviews</span>
+</div>
+</nav>
+<!-- iOS Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full z-[60]"></div>
+</body></html>

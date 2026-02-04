@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Submit Rating &amp; Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    screens: {
+                        'xs': '280px',
+                        'sm': '640px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                        '2xl': '1536px',
+                        '3xl': '1920px',
+                        '4xl': '2560px',
+                    },
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .star-inactive {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  
+        /* Enhanced responsive design for all devices */
+        @media (min-width: 280px) {
+            :root {
+                font-size: clamp(12px, 3vw, 16px);
+            }
+        }
+        @media (min-width: 640px) {
+            :root {
+                font-size: clamp(14px, 2vw, 16px);
+            }
+        }
+        @media (min-width: 1024px) {
+            :root {
+                font-size: clamp(15px, 1.2vw, 18px);
+            }
+        }
+        @media (min-width: 1920px) {
+            :root {
+                font-size: clamp(16px, 1vw, 20px);
+            }
+        }
+        @media (min-width: 2560px) {
+            :root {
+                font-size: clamp(18px, 0.8vw, 24px);
+            }
+        }
+        
+        .container-responsive {
+            max-width: clamp(280px, 100%, 1920px);
+            margin: 0 auto;
+            padding: clamp(0.5rem, 2vw, 2rem);
+        }
+        
+        .text-responsive {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+        }
+        
+        .heading-responsive {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+        }
+
+    </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white">
+<div class="relative flex h-screen w-full flex-col overflow-x-hidden">
+<!-- TopAppBar -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-white/10">
+<a href="my_bookings.html" class="text-white flex size-12 shrink-0 items-center">
+<span class="material-symbols-outlined cursor-pointer">close</span>
+</a>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Submit Review</h2>
+<div class="flex w-12 items-center justify-end">
+<p class="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0 cursor-pointer">Post</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pb-24">
+<!-- Section: Rate Your Driver -->
+<div class="p-4 border-b border-white/5 bg-white/5 mt-4 mx-4 rounded-xl">
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Rate Your Driver</h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16" data-alt="professional driver profile headshot" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZfDe-oTX8-yG1xtCl_2FpxEBcvLwm-XnWPQL-1F7PFm_xc2NCRcwwLEHoIplRaNaeufEmXsW5Bq1aq36yvyjYi-KsTMS8a3vQm8KgC8TwDEg6SWxzL6r7Ki95_g-ntMCPQ8_TTxJPbnJY9Pok0EEYgP_6D82xVWyZv9aiGhKYaQmqoVC6bA7dOf3eXMGA3wA3BRXJYDJ4E0r_kJaNp87v2dYln7FL4HNWhijtKlbD7U0JStkYptabjOIN6ZxrGvflQ1aGqBL9ogCR");'></div>
+<div class="flex flex-col">
+<p class="text-white text-lg font-bold leading-tight">Marcus Johnson</p>
+<p class="text-[#92adc9] text-sm font-normal">License: B-29384</p>
+</div>
+</div>
+<!-- ReactionBar (Stars) -->
+<div class="flex gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined star-inactive text-[#92adc9] text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+</div>
+<!-- TextField -->
+<div class="flex flex-col gap-2">
+<label class="text-white text-sm font-medium">Comments on Driver</label>
+<textarea class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="How was the service? (optional)"></textarea>
+</div>
+</div>
+<!-- Section: Rate Your Car -->
+<div class="p-4 border-b border-white/5 bg-white/5 mt-6 mx-4 rounded-xl">
+<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Rate Your Car</h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="bg-center bg-no-repeat aspect-[16/9] bg-cover rounded-lg h-16 w-24" data-alt="sleek modern electric car in blue" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_fKa0Jmi_zvJD-OJSBZFmCIDVlFkiNySzyuBzTZ4F6rxm1hnHz6gc1q1n114SUBXVKAH4TUZo-lcVKGIjcuStFfOaRKDMxG_ZyeHXtxrxdcA7bIsvmKJmr77WF679CJz_RV-x5PclCuHfKTflD_2ElHllvCjhucTfxsOEDSvxiX-a4VgAjyFKnNjZ1XUJbw8qzFKlwKOidmyhr3pBEDmNbnd5Hm5UAycdHdH136EX5lDuH-23I9tD0PWbhSUY8A1M3U5af3hToHCL");'></div>
+<div class="flex flex-col">
+<p class="text-white text-lg font-bold leading-tight">Tesla Model S</p>
+<p class="text-[#92adc9] text-sm font-normal">Midnight Blue • AWD</p>
+</div>
+</div>
+<!-- ReactionBar (Stars) -->
+<div class="flex gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+</div>
+<!-- TextField -->
+<div class="flex flex-col gap-2 mb-6">
+<label class="text-white text-sm font-medium">Comments on Vehicle</label>
+<textarea class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="Condition, cleanliness, performance..."></textarea>
+</div>
+<!-- Image Upload Section -->
+<div class="flex flex-col gap-3">
+<label class="text-white text-sm font-medium">Vehicle Condition Photos</label>
+<div class="flex gap-3">
+<div class="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-[#324d67] rounded-lg bg-[#192633] hover:bg-[#25394d] cursor-pointer">
+<span class="material-symbols-outlined text-primary">add_a_photo</span>
+<span class="text-[10px] text-[#92adc9] mt-1 font-medium">Add Photo</span>
+</div>
+<div class="relative w-24 h-24 rounded-lg bg-cover bg-center border border-[#324d67]" data-alt="thumbnail of car interior" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDpbvO4CmYCU8ZVsw7qMuMroBZqkB590u9RbRF7cxgqzWjXl-PsS97fLuO-0Cp7E3dErXiGo1HNhkv4XFXnbjXguolm_SjR5qhuwP6RcEnkKd4iV9CZrBtBSZWMj156z9K1AamnCvdTolaGykRQlbD_soeyz4GjRBiSDOmZWeXjoC8aaHzLsSXiK1yi2trcCdKrRq9bTWbBrBzInNp49R4_HsqQXVqvawdMaFm9Ohz9XLH4VCV3cTpnAaK5qr2p3BI9Dvo2VMdGRw60");'>
+<div class="absolute -top-2 -right-2 bg-red-500 rounded-full p-0.5 flex items-center justify-center border border-background-dark">
+<span class="material-symbols-outlined text-[14px] font-bold">close</span>
+</div>
+</div>
+</div>
+<p class="text-[11px] text-[#92adc9]">Upload photos of any damages or cleanliness issues found.</p>
+</div>
+</div>
+<!-- Bottom Disclaimer -->
+<p class="px-8 py-6 text-center text-[#92adc9] text-xs">
+                Your feedback helps us maintain a high-quality service. Reviews are shared with the driver and the fleet operator anonymously.
+            </p>
+</div>
+<!-- Fixed Bottom Button Area -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-dark border-t border-white/10">
+<button class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all" onclick="alert('Thank you for your review!'); window.location.href='index.html'">
+                Submit Review
+            </button>
+</div>
+</div>
+</body></html>
