@@ -312,18 +312,18 @@ function renderBookings() {
                     
                     <div class="flex gap-2">
                         ${booking.booking_status === 'completed' ? `
-                            <a href="submit_rating_review.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+                            <a href="submit_rating_review.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
                                 Leave Review
                             </a>
                         ` : ''}
                         ${booking.booking_status === 'pending' && !booking.payment_status ? `
-                            <a href="payment_proof_upload.html?booking=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
+                            <a href="payment_proof_upload.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors">
                                 Submit Payment
                             </a>
                         ` : ''}
-                        <button class="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="viewDetails('${booking.reference_number}')">
+                        <a href="booking_details.html?booking_id=${booking.id}" class="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-center py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                             View Details
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -335,10 +335,6 @@ function showEmpty() {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('bookingsList').style.display = 'none';
     document.getElementById('emptyState').style.display = 'block';
-}
-
-function viewDetails(refNumber) {
-    alert(`Booking Details for ${refNumber}\n\nDetailed view coming soon!`);
 }
 
 // Filter tabs

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booking Details - VeloDrive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+              "card-light": "#ffffff",
+              "card-dark": "#192633",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ios-tab-bar { padding-bottom: env(safe-area-inset-bottom); }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen pb-24">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+    <div class="flex items-center justify-between px-4 py-4">
+        <a href="my_bookings.html" class="flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-lg font-bold flex-1 text-center pr-10">Booking Details</h1>
+    </div>
+</header>
+
+<main class="max-w-3xl mx-auto p-4 space-y-6">
+    <!-- Loading State -->
+    <div id="loadingState" class="py-12 text-center">
+        <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+        <p class="mt-4 text-gray-500">Loading details...</p>
+    </div>
+
+    <!-- Booking Info Card -->
+    <div id="bookingContent" style="display: none;" class="space-y-6">
+        <div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">Reference Number</p>
+                    <h2 id="refNumber" class="text-xl font-bold text-primary">---</h2>
+                </div>
+                <span id="bookingStatus" class="px-3 py-1 rounded-full text-xs font-bold uppercase">---</span>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                <div id="vehicleImage" class="w-full md:w-48 h-40 bg-gray-200 dark:bg-gray-700 rounded-xl bg-center bg-cover shadow-inner shrink-0"></div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="vehicleName" class="text-xl font-bold mb-1 truncate">---</h3>
+                    <p id="plateNumber" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-medium">---</p>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-lg">settings_input_component</span>
+                            <span id="transmission" class="font-semibold">---</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
+                            <span class="material-symbols-outlined text-primary text-lg">local_gas_station</span>
+                            <span id="fuelType" class="font-semibold">---</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-100 dark:border-gray-800 pt-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-2">Pickup</p>
+                        <p id="pickupDate" class="font-semibold">---</p>
+                        <p id="pickupLocation" class="text-sm text-gray-500">---</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase mb-2">Dropoff</p>
+                        <p id="dropoffDate" class="font-semibold">---</p>
+                        <p id="dropoffLocation" class="text-sm text-gray-500">---</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+            <h3 class="text-lg font-bold mb-4">Payment Summary</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Rental Rate (<span id="rentalDays">0</span> days)</span>
+                    <span id="subtotal">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Insurance Fee</span>
+                    <span id="insurance">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Service Fee</span>
+                    <span id="serviceFee">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-base font-bold pt-3 border-t border-gray-100 dark:border-gray-800">
+                    <span>Total Amount</span>
+                    <span id="totalAmount">₱0.00</span>
+                </div>
+                <div class="flex justify-between text-sm text-primary pt-1">
+                    <span>Downpayment Required (20%)</span>
+                    <span id="downpayment">₱0.00</span>
+                </div>
+            </div>
+
+            <div id="paymentStatusBox" class="mt-6 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium">Payment Status</span>
+                    <span id="paymentStatus" class="text-sm font-bold capitalize">---</span>
+                </div>
+                <p id="paymentMethod" class="text-xs text-gray-500">---</p>
+            </div>
+
+            <div id="actionButtons" class="mt-6 flex gap-3">
+                <!-- Dynamic actions based on status -->
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('booking_id');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    if (!user) {
+        window.location.href = 'user_authentication.html';
+    }
+
+    if (!bookingId) {
+        window.location.href = 'my_bookings.html';
+    }
+
+    async function loadBookingDetails() {
+        try {
+            const response = await fetch(`../api/bookings.php?booking_id=${bookingId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                displayDetails(data.data);
+            } else {
+                alert('Booking not found');
+                window.location.href = 'my_bookings.html';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to load booking details');
+        }
+    }
+
+    function displayDetails(booking) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('bookingContent').style.display = 'block';
+
+        document.getElementById('refNumber').textContent = booking.reference_number;
+        document.getElementById('vehicleName').textContent = booking.vehicle_name;
+        document.getElementById('plateNumber').textContent = booking.plate_number;
+        document.getElementById('transmission').textContent = booking.transmission;
+        document.getElementById('fuelType').textContent = booking.fuel_type;
+        document.getElementById('vehicleImage').style.backgroundImage = `url('${booking.vehicle_image}')`;
+
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('pickupDate').textContent = new Date(booking.pickup_date).toLocaleDateString('en-US', options);
+        document.getElementById('dropoffDate').textContent = new Date(booking.dropoff_date).toLocaleDateString('en-US', options);
+        document.getElementById('pickupLocation').textContent = booking.pickup_location;
+        document.getElementById('dropoffLocation').textContent = booking.dropoff_location;
+
+        document.getElementById('rentalDays').textContent = booking.rental_days;
+        document.getElementById('subtotal').textContent = `₱${(booking.daily_rate * booking.rental_days).toFixed(2)}`;
+        document.getElementById('insurance').textContent = `₱${parseFloat(booking.insurance_amount).toFixed(2)}`;
+        document.getElementById('serviceFee').textContent = `₱${parseFloat(booking.service_fee).toFixed(2)}`;
+        document.getElementById('totalAmount').textContent = `₱${parseFloat(booking.total_amount).toFixed(2)}`;
+        document.getElementById('downpayment').textContent = `₱${parseFloat(booking.downpayment_amount).toFixed(2)}`;
+
+        const statusColors = {
+            'pending': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+            'confirmed': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+            'active': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+            'completed': 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300',
+            'cancelled': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+        };
+
+        const statusEl = document.getElementById('bookingStatus');
+        statusEl.textContent = booking.booking_status;
+        statusEl.className = `px-3 py-1 rounded-full text-xs font-bold uppercase ${statusColors[booking.booking_status] || statusColors.pending}`;
+
+        const paymentStatusEl = document.getElementById('paymentStatus');
+        paymentStatusEl.textContent = booking.payment_status || 'Not Paid';
+        paymentStatusEl.className = `text-sm font-bold capitalize ${booking.payment_status === 'verified' ? 'text-green-600' : 'text-orange-600'}`;
+
+        document.getElementById('paymentMethod').textContent = booking.payment_method ? `Paid via ${booking.payment_method.toUpperCase()}` : 'Payment action required';
+
+        // Action Buttons
+        const actionButtons = document.getElementById('actionButtons');
+        actionButtons.innerHTML = '';
+
+        if (booking.booking_status === 'pending' && !booking.payment_status) {
+            actionButtons.innerHTML += `
+                <a href="payment_proof_upload.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
+                    Submit Payment
+                </a>
+            `;
+        } else if (booking.booking_status === 'completed') {
+            actionButtons.innerHTML += `
+                <a href="submit_rating_review.html?booking_id=${booking.id}" class="flex-1 bg-primary text-white text-center py-3 rounded-xl font-bold hover:bg-primary/90 transition-colors">
+                    Leave a Review
+                </a>
+            `;
+        }
+
+        actionButtons.innerHTML += `
+            <button onclick="window.print()" class="px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                <span class="material-symbols-outlined text-base">print</span>
+            </button>
+        `;
+    }
+
+    loadBookingDetails();
+</script>
+
+</body>
+</html>

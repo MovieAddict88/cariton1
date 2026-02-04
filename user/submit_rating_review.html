@@ -38,6 +38,7 @@
     </script>
 <style>
         .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         .star-inactive {
@@ -101,56 +102,56 @@
 </a>
 <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Submit Review</h2>
 <div class="flex w-12 items-center justify-end">
-<p class="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0 cursor-pointer">Post</p>
+<button id="postReviewTop" class="text-primary text-base font-bold leading-normal tracking-[0.015em] shrink-0 cursor-pointer">Post</button>
 </div>
 </div>
 <div class="flex-1 overflow-y-auto pb-24">
 <!-- Section: Rate Your Driver -->
-<div class="p-4 border-b border-white/5 bg-white/5 mt-4 mx-4 rounded-xl">
+<div id="driverSection" class="p-4 border-b border-white/5 bg-white/5 mt-4 mx-4 rounded-xl" style="display: none;">
 <h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Rate Your Driver</h3>
 <div class="flex items-center gap-4 mb-6">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16" data-alt="professional driver profile headshot" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBZfDe-oTX8-yG1xtCl_2FpxEBcvLwm-XnWPQL-1F7PFm_xc2NCRcwwLEHoIplRaNaeufEmXsW5Bq1aq36yvyjYi-KsTMS8a3vQm8KgC8TwDEg6SWxzL6r7Ki95_g-ntMCPQ8_TTxJPbnJY9Pok0EEYgP_6D82xVWyZv9aiGhKYaQmqoVC6bA7dOf3eXMGA3wA3BRXJYDJ4E0r_kJaNp87v2dYln7FL4HNWhijtKlbD7U0JStkYptabjOIN6ZxrGvflQ1aGqBL9ogCR");'></div>
+<div id="driverImage" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16" style='background-image: url("https://ui-avatars.com/api/?name=Driver&background=random");'></div>
 <div class="flex flex-col">
-<p class="text-white text-lg font-bold leading-tight">Marcus Johnson</p>
-<p class="text-[#92adc9] text-sm font-normal">License: B-29384</p>
+<p id="driverName" class="text-white text-lg font-bold leading-tight">Loading...</p>
+<p id="driverLicense" class="text-[#92adc9] text-sm font-normal">License: ---</p>
 </div>
 </div>
 <!-- ReactionBar (Stars) -->
-<div class="flex gap-2 mb-6">
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined star-inactive text-[#92adc9] text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<div class="flex gap-2 mb-6 star-rating" data-type="driver">
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="1">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="2">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="3">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="4">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="5">star</span>
 </div>
 <!-- TextField -->
 <div class="flex flex-col gap-2">
 <label class="text-white text-sm font-medium">Comments on Driver</label>
-<textarea class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="How was the service? (optional)"></textarea>
+<textarea id="driverComment" class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="How was the service? (optional)"></textarea>
 </div>
 </div>
 <!-- Section: Rate Your Car -->
 <div class="p-4 border-b border-white/5 bg-white/5 mt-6 mx-4 rounded-xl">
 <h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Rate Your Car</h3>
 <div class="flex items-center gap-4 mb-6">
-<div class="bg-center bg-no-repeat aspect-[16/9] bg-cover rounded-lg h-16 w-24" data-alt="sleek modern electric car in blue" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_fKa0Jmi_zvJD-OJSBZFmCIDVlFkiNySzyuBzTZ4F6rxm1hnHz6gc1q1n114SUBXVKAH4TUZo-lcVKGIjcuStFfOaRKDMxG_ZyeHXtxrxdcA7bIsvmKJmr77WF679CJz_RV-x5PclCuHfKTflD_2ElHllvCjhucTfxsOEDSvxiX-a4VgAjyFKnNjZ1XUJbw8qzFKlwKOidmyhr3pBEDmNbnd5Hm5UAycdHdH136EX5lDuH-23I9tD0PWbhSUY8A1M3U5af3hToHCL");'></div>
+<div id="vehicleImage" class="bg-center bg-no-repeat aspect-[16/9] bg-cover rounded-lg h-16 w-24" style='background-image: url("https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400");'></div>
 <div class="flex flex-col">
-<p class="text-white text-lg font-bold leading-tight">Tesla Model S</p>
-<p class="text-[#92adc9] text-sm font-normal">Midnight Blue • AWD</p>
+<p id="vehicleName" class="text-white text-lg font-bold leading-tight">Loading Car...</p>
+<p id="vehicleDetails" class="text-[#92adc9] text-sm font-normal">---</p>
 </div>
 </div>
 <!-- ReactionBar (Stars) -->
-<div class="flex gap-2 mb-6">
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
-<span class="material-symbols-outlined text-primary text-3xl cursor-pointer hover:text-yellow-400 transition-colors">star</span>
+<div class="flex gap-2 mb-6 star-rating" data-type="vehicle">
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="1">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="2">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="3">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="4">star</span>
+<span class="material-symbols-outlined text-primary text-3xl cursor-pointer" data-value="5">star</span>
 </div>
 <!-- TextField -->
 <div class="flex flex-col gap-2 mb-6">
 <label class="text-white text-sm font-medium">Comments on Vehicle</label>
-<textarea class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="Condition, cleanliness, performance..."></textarea>
+<textarea id="vehicleComment" class="form-input flex w-full rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#324d67] bg-[#192633] focus:border-primary min-h-24 placeholder:text-[#92adc9]/50 p-3 text-base font-normal" placeholder="Condition, cleanliness, performance..."></textarea>
 </div>
 <!-- Image Upload Section -->
 <div class="flex flex-col gap-3">
@@ -176,9 +177,117 @@
 </div>
 <!-- Fixed Bottom Button Area -->
 <div class="fixed bottom-0 left-0 right-0 p-4 bg-background-dark border-t border-white/10">
-<button class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all" onclick="alert('Thank you for your review!'); window.location.href='index.html'">
+<button id="submitReviewBtn" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all">
                 Submit Review
             </button>
 </div>
 </div>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('booking_id');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    if (!user || !bookingId) {
+        window.location.href = 'my_bookings.html';
+    }
+
+    let ratings = {
+        driver: 5,
+        vehicle: 5,
+        overall: 5,
+        service: 5
+    };
+
+    // Load booking details
+    async function loadBooking() {
+        try {
+            const response = await fetch(`../api/bookings.php?booking_id=${bookingId}`);
+            const data = await response.json();
+            if (data.success) {
+                const booking = data.data;
+                document.getElementById('vehicleName').textContent = booking.vehicle_name;
+                document.getElementById('vehicleDetails').textContent = `${booking.make} • ${booking.model}`;
+                document.getElementById('vehicleImage').style.backgroundImage = `url('${booking.vehicle_image}')`;
+
+                // If there's a driver, show driver section
+                // Note: The API might need to return driver info
+                if (booking.driver_id) {
+                    document.getElementById('driverSection').style.display = 'block';
+                    // Fetch driver info if needed or use placeholder
+                    document.getElementById('driverName').textContent = "Assigned Driver";
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Star rating logic
+    document.querySelectorAll('.star-rating').forEach(container => {
+        const type = container.dataset.type;
+        const stars = container.querySelectorAll('.material-symbols-outlined');
+
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = parseInt(star.dataset.value);
+                ratings[type] = value;
+
+                // Update UI
+                stars.forEach(s => {
+                    const sValue = parseInt(s.dataset.value);
+                    if (sValue <= value) {
+                        s.classList.remove('star-inactive');
+                        s.style.fontVariationSettings = "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+                    } else {
+                        s.classList.add('star-inactive');
+                        s.style.fontVariationSettings = "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+                    }
+                });
+            });
+        });
+    });
+
+    async function submitReview() {
+        const btn = document.getElementById('submitReviewBtn');
+        btn.disabled = true;
+        btn.innerHTML = 'Submitting...';
+
+        try {
+            const response = await fetch('../api/reviews.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    booking_id: bookingId,
+                    user_id: user.user_id,
+                    overall_rating: ratings.vehicle, // simplified
+                    vehicle_rating: ratings.vehicle,
+                    driver_rating: ratings.driver,
+                    service_rating: 5,
+                    vehicle_comment: document.getElementById('vehicleComment').value,
+                    driver_comment: document.getElementById('driverComment').value
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Thank you for your review!');
+                window.location.href = 'my_bookings.html';
+            } else {
+                alert(data.error || 'Failed to submit review');
+                btn.disabled = false;
+                btn.innerHTML = 'Submit Review';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+            btn.disabled = false;
+            btn.innerHTML = 'Submit Review';
+        }
+    }
+
+    document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
+    document.getElementById('postReviewTop').addEventListener('click', submitReview);
+
+    loadBooking();
+</script>
 </body></html>

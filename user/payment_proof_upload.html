@@ -237,7 +237,7 @@
 <script>
 // Get booking data
 const urlParams = new URLSearchParams(window.location.search);
-const bookingId = urlParams.get('booking');
+const bookingId = urlParams.get('booking_id');
 const bookingData = JSON.parse(localStorage.getItem('currentBooking') || 'null');
 
 if (!bookingId || !bookingData) {
