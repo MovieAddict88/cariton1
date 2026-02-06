@@ -70,6 +70,12 @@ try {
     $stmt->execute([$email, $hashed_password, $first_name, $last_name, $phone]);
     
     $user_id = $pdo->lastInsertId();
+
+    // Set session for PHP pages
+    $_SESSION['user_id'] = $user_id;
+    $_SESSION['user_email'] = $email;
+    $_SESSION['user_name'] = $first_name . ' ' . $last_name;
+    $_SESSION['logged_in'] = true;
     
     echo json_encode([
         'success' => true,

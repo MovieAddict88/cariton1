@@ -17,7 +17,7 @@ try {
         if (isset($_POST['update_system_settings'])) {
             // Update system settings
             foreach ($_POST['settings'] as $key => $value) {
-                $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+                $stmt = $pdo->prepare("INSERT INTO settings (key_name, key_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE key_value = VALUES(key_value)");
                 $stmt->execute([$key, $value]);
             }
             $message = 'System settings updated successfully!';
@@ -41,10 +41,10 @@ try {
     }
 
     // Get current settings
-    $stmt = $pdo->query("SELECT * FROM system_settings");
+    $stmt = $pdo->query("SELECT * FROM settings");
     $system_settings = [];
     while ($row = $stmt->fetch()) {
-        $system_settings[$row['setting_key']] = $row['setting_value'];
+        $system_settings[$row['key_name']] = $row['key_value'];
     }
 
     $stmt = $pdo->query("SELECT * FROM company_info WHERE id = 1");

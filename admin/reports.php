@@ -72,50 +72,67 @@ try {
 }
 
 function generateReportPDF($pdo, $revenue_data, $vehicles, $stats) {
-    // Simple HTML to PDF generation using TCPDF-like approach
-    $html = '<html><head><title>Cariton Reports</title>';
+    // Professional HTML report generation
+    $html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Cariton Analytics Report</title>';
     $html .= '<style>
-                body { font-family: Arial, sans-serif; margin: 20px; }
-                h1 { color: #137fec; }
-                .stat { margin: 10px 0; }
-                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
+                body { font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #1e293b; background: #f8fafc; margin: 0; padding: 40px; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
+                .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #137fec; padding-bottom: 20px; margin-bottom: 30px; }
+                h1 { color: #137fec; margin: 0; font-size: 24px; }
+                .date { color: #64748b; font-size: 14px; }
+                .grid { display: grid; grid-template-cols: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+                .stat-card { background: #f1f5f9; padding: 15px; rounded-lg; text-align: center; border-radius: 8px; }
+                .stat-value { display: block; font-size: 20px; font-weight: bold; color: #0f172a; }
+                .stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+                h2 { font-size: 18px; color: #334155; margin-top: 30px; margin-bottom: 15px; border-left: 4px solid #137fec; padding-left: 10px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th { background-color: #f8fafc; color: #475569; font-weight: 600; text-align: left; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; padding: 12px 8px; }
+                td { padding: 12px 8px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+                tr:last-child td { border-bottom: none; }
+                .currency { font-family: monospace; font-weight: 600; }
+                .btn-print { background: #137fec; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+                @media print { .no-print { display: none; } body { padding: 0; background: white; } .container { border: none; max-width: 100%; padding: 0; } }
               </style></head><body>';
     
-    $html .= '<h1>Cariton Rental Services - Monthly Report</h1>';
-    $html .= '<p>Generated on: ' . date('Y-m-d H:i:s') . '</p>';
+    $html .= '<div class="container">';
+    $html .= '<button class="btn-print no-print" onclick="window.print()">Print Report</button>';
+    $html .= '<div class="header"><div><h1>Cariton Rental Services</h1><p style="margin:5px 0 0 0; color:#64748b;">Fleet Analytics & Revenue Report</p></div>';
+    $html .= '<div class="date">Generated: ' . date('M d, Y H:i') . '</div></div>';
     
     $html .= '<h2>Activity Summary</h2>';
-    $html .= '<div class="stat">Bookings Today: ' . ($stats['bookings_today'] ?? 0) . '</div>';
-    $html .= '<div class="stat">Bookings This Week: ' . ($stats['bookings_week'] ?? 0) . '</div>';
-    $html .= '<div class="stat">Bookings This Month: ' . ($stats['bookings_month'] ?? 0) . '</div>';
+    $html .= '<div class="grid">';
+    $html .= '<div class="stat-card"><span class="stat-value">' . ($stats['bookings_today'] ?? 0) . '</span><span class="stat-label">Bookings Today</span></div>';
+    $html .= '<div class="stat-card"><span class="stat-value">' . ($stats['bookings_week'] ?? 0) . '</span><span class="stat-label">This Week</span></div>';
+    $html .= '<div class="stat-card"><span class="stat-value">' . ($stats['bookings_month'] ?? 0) . '</span><span class="stat-label">This Month</span></div>';
+    $html .= '</div>';
     
     $html .= '<h2>Revenue by Month</h2>';
-    $html .= '<table><tr><th>Month</th><th>Revenue (₱)</th></tr>';
+    $html .= '<table><thead><tr><th>Month</th><th>Revenue</th></tr></thead><tbody>';
     foreach ($revenue_data as $month => $revenue) {
-        $html .= '<tr><td>' . $month . '</td><td>₱' . number_format($revenue, 2) . '</td></tr>';
+        $html .= '<tr><td>' . $month . '</td><td class="currency">₱' . number_format($revenue, 2) . '</td></tr>';
     }
-    $html .= '</table>';
+    $html .= '</tbody></table>';
     
     if (!empty($vehicles)) {
         $html .= '<h2>Top Performing Vehicles</h2>';
-        $html .= '<table><tr><th>Vehicle</th><th>Trips</th><th>Revenue (₱)</th></tr>';
+        $html .= '<table><thead><tr><th>Vehicle Model</th><th style="text-align:center;">Total Trips</th><th>Total Revenue</th></tr></thead><tbody>';
         foreach ($vehicles as $vehicle) {
             $html .= '<tr><td>' . htmlspecialchars($vehicle['make'] . ' ' . $vehicle['model']) . '</td>';
-            $html .= '<td>' . $vehicle['trips'] . '</td>';
-            $html .= '<td>₱' . number_format($vehicle['revenue'], 2) . '</td></tr>';
+            $html .= '<td style="text-align:center;">' . $vehicle['trips'] . '</td>';
+            $html .= '<td class="currency">₱' . number_format($vehicle['revenue'], 2) . '</td></tr>';
         }
-        $html .= '</table>';
+        $html .= '</tbody></table>';
     }
     
+    $html .= '<div style="margin-top:50px; padding-top:20px; border-top:1px solid #e2e8f0; font-size:11px; color:#94a3b8; text-align:center;">';
+    $html .= 'This is an automatically generated system report. &copy; ' . date('Y') . ' Cariton Rental Management System.';
+    $html .= '</div></div>';
+    
+    $html .= '<script>window.onload = () => { setTimeout(() => { window.print(); }, 500); }</script>';
     $html .= '</body></html>';
     
-    // Output as PDF
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="cariton-report-' . date('Y-m-d') . '.pdf"');
-    
-    // Simple HTML to PDF conversion (in a real implementation, you'd use a library like TCPDF or Dompdf)
+    // Set proper headers
+    header('Content-Type: text/html; charset=utf-8');
     echo $html;
 }
 ?>
