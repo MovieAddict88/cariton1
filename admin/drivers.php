@@ -15,26 +15,37 @@ try {
     // Handle form submissions
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['add_driver'])) {
-            $stmt = $pdo->prepare("INSERT INTO drivers (first_name, last_name, email, phone, license_number, employee_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO drivers (first_name, last_name, email, phone, license_number, license_expiry, employee_id, status, hire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURDATE())");
             $stmt->execute([
                 $_POST['first_name'], $_POST['last_name'], $_POST['email'], 
-                $_POST['phone'], $_POST['license_number'], $_POST['employee_id'], 
-                $_POST['status'] ?? 'active'
+                $_POST['phone'], $_POST['license_number'], $_POST['license_expiry'],
+                $_POST['employee_id'], $_POST['status'] ?? 'active'
             ]);
             $message = 'Driver added successfully!';
         } elseif (isset($_POST['update_status'])) {
             $stmt = $pdo->prepare("UPDATE drivers SET status = ? WHERE id = ?");
             $stmt->execute([$_POST['status'], $_POST['driver_id']]);
             $message = 'Driver status updated!';
+        } elseif (isset($_POST['archive_driver'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET status = 'archived' WHERE id = ?");
+            $stmt->execute([$_POST['driver_id']]);
+            $message = 'Driver archived!';
+        } elseif (isset($_POST['unarchive_driver'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET status = 'active' WHERE id = ?");
+            $stmt->execute([$_POST['driver_id']]);
+            $message = 'Driver restored!';
         } elseif (isset($_POST['delete_driver'])) {
             $stmt = $pdo->prepare("DELETE FROM drivers WHERE id = ?");
             $stmt->execute([$_POST['driver_id']]);
-            $message = 'Driver deleted!';
+            $message = 'Driver deleted permanently!';
         }
     }
 
+    $view = $_GET['view'] ?? 'active';
+    $status_filter = $view === 'archived' ? "status = 'archived'" : "status != 'archived'";
+
     // Get drivers
-    $stmt = $pdo->query("SELECT d.*, v.make, v.model FROM drivers d LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id ORDER BY d.created_at DESC");
+    $stmt = $pdo->query("SELECT d.*, v.make, v.model FROM drivers d LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id WHERE d.$status_filter ORDER BY d.created_at DESC");
     $drivers = $stmt->fetchAll();
 
 } catch (PDOException $e) {
@@ -52,12 +63,18 @@ try {
                 <button class="text-slate-900 dark:text-white flex size-10 items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full lg:hidden" onclick="toggleSidebar()">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
-                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Driver Roster</h2>
+                <h2 class="text-slate-900 dark:text-white text-lg font-bold"><?= $view === 'archived' ? 'Archived Drivers' : 'Driver Roster' ?></h2>
             </div>
-            <button onclick="document.getElementById('addDriverModal').classList.remove('hidden')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
-                <span class="material-symbols-outlined">person_add</span>
-                <span class="hidden sm:inline">Add Driver</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <a href="?view=<?= $view === 'archived' ? 'active' : 'archived' ?>" class="text-slate-600 dark:text-slate-400 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <span class="material-symbols-outlined"><?= $view === 'archived' ? 'group' : 'archive' ?></span>
+                    <span class="hidden sm:inline"><?= $view === 'archived' ? 'View Active' : 'View Archived' ?></span>
+                </a>
+                <button onclick="document.getElementById('addDriverModal').classList.remove('hidden')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined">person_add</span>
+                    <span class="hidden sm:inline">Add Driver</span>
+                </button>
+            </div>
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 admin-content">
@@ -69,49 +86,13 @@ try {
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <?php if (empty($drivers)): ?>
-                    <!-- Mock drivers if DB is empty -->
-                    <?php 
-                    $mock_drivers = [
-                        ['id' => 1, 'first_name' => 'Johnathan', 'last_name' => 'Doe', 'employee_id' => 'DRV-001', 'status' => 'active', 'phone' => '+63 912 345 6789', 'rating' => 4.8],
-                        ['id' => 2, 'first_name' => 'Sarah', 'last_name' => 'Jenkins', 'employee_id' => 'DRV-002', 'status' => 'active', 'phone' => '+63 912 345 6789', 'rating' => 4.9],
-                        ['id' => 3, 'first_name' => 'Michael', 'last_name' => 'Chen', 'employee_id' => 'DRV-003', 'status' => 'on_leave', 'phone' => '+63 912 345 6789', 'rating' => 4.7],
-                    ];
-                    foreach($mock_drivers as $d): ?>
-                        <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                            <div class="flex items-center gap-4 mb-6">
-                                <div class="size-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-primary/20 flex items-center justify-center overflow-hidden">
-                                    <img src="https://ui-avatars.com/api/?name=<?= $d['first_name'] ?>+<?= $d['last_name'] ?>&background=random" class="w-full h-full object-cover">
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-lg"><?= $d['first_name'] . ' ' . $d['last_name'] ?></h3>
-                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider"><?= $d['employee_id'] ?></p>
-                                </div>
-                            </div>
-                            <div class="space-y-3 mb-6">
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">Status</span>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase <?= $d['status'] == 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' ?>">
-                                        <?= $d['status'] ?>
-                                    </span>
-                                </div>
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">Phone</span>
-                                    <span class="font-medium"><?= $d['phone'] ?></span>
-                                </div>
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">Rating</span>
-                                    <div class="flex items-center gap-1 text-amber-500 font-bold">
-                                        <span class="material-symbols-outlined text-sm fill-1">star</span>
-                                        <?= $d['rating'] ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 mt-4">
-                                <a href="driver_details.php?id=<?= $d['id'] ?>" class="flex-1 bg-slate-100 dark:bg-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center">Details</a>
-                                <button class="flex-1 bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors">Assign</button>
-                            </div>
+                    <div class="col-span-full py-12 text-center">
+                        <div class="bg-slate-100 dark:bg-slate-800 size-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-4xl text-slate-400">group_off</span>
                         </div>
-                    <?php endforeach; ?>
+                        <h3 class="text-lg font-bold">No Drivers Found</h3>
+                        <p class="text-slate-500">There are no <?= $view === 'archived' ? 'archived' : '' ?> drivers to display.</p>
+                    </div>
                 <?php else: ?>
                     <?php foreach ($drivers as $d): ?>
                         <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
@@ -144,14 +125,32 @@ try {
                                         <option value="active" <?= $d['status'] === 'active' ? 'selected' : '' ?>>Active</option>
                                         <option value="inactive" <?= $d['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
                                         <option value="on_leave" <?= $d['status'] === 'on_leave' ? 'selected' : '' ?>>On Leave</option>
+                                        <?php if ($d['status'] === 'archived'): ?>
+                                            <option value="archived" selected>Archived</option>
+                                        <?php endif; ?>
                                     </select>
                                 </form>
-                                <a href="driver_details.php?id=<?= $d['id'] ?>" class="p-2 text-slate-400 hover:text-primary transition-colors flex items-center justify-center">
+                                <a href="driver_details.php?id=<?= $d['id'] ?>" class="p-2 text-slate-400 hover:text-primary transition-colors flex items-center justify-center" title="Edit Profile">
                                     <span class="material-symbols-outlined">edit</span>
                                 </a>
-                                <form method="POST" onsubmit="return confirm('Delete this driver?');" class="inline">
+                                <?php if ($d['status'] !== 'archived'): ?>
+                                    <form method="POST" onsubmit="return confirm('Archive this driver?');" class="inline">
+                                        <input type="hidden" name="driver_id" value="<?= $d['id'] ?>">
+                                        <button type="submit" name="archive_driver" class="p-2 text-slate-400 hover:text-amber-500 transition-colors flex items-center justify-center" title="Archive Driver">
+                                            <span class="material-symbols-outlined">archive</span>
+                                        </button>
+                                    </form>
+                                <?php else: ?>
+                                    <form method="POST" onsubmit="return confirm('Restore this driver?');" class="inline">
+                                        <input type="hidden" name="driver_id" value="<?= $d['id'] ?>">
+                                        <button type="submit" name="unarchive_driver" class="p-2 text-slate-400 hover:text-emerald-500 transition-colors flex items-center justify-center" title="Restore Driver">
+                                            <span class="material-symbols-outlined">unarchive</span>
+                                        </button>
+                                    </form>
+                                <?php endif; ?>
+                                <form method="POST" onsubmit="return confirm('Permanently delete this driver? This cannot be undone.');" class="inline">
                                     <input type="hidden" name="driver_id" value="<?= $d['id'] ?>">
-                                    <button type="submit" name="delete_driver" class="p-2 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center">
+                                    <button type="submit" name="delete_driver" class="p-2 text-slate-400 hover:text-rose-500 transition-colors flex items-center justify-center" title="Delete Permanently">
                                         <span class="material-symbols-outlined">delete</span>
                                     </button>
                                 </form>
@@ -200,9 +199,13 @@ try {
                     <input type="text" name="license_number" required placeholder="D01-123456789" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee ID</label>
-                    <input type="text" name="employee_id" required placeholder="DRV-001" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">License Expiry</label>
+                    <input type="date" name="license_expiry" required class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
                 </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee ID</label>
+                <input type="text" name="employee_id" required placeholder="DRV-001" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary">
             </div>
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Status</label>

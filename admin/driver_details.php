@@ -16,12 +16,23 @@ try {
     
     // Handle form submissions
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $stmt = $pdo->prepare("UPDATE drivers SET phone = ?, license_number = ?, license_expiry = ?, experience_years = ? WHERE id = ?");
-        $stmt->execute([
-            $_POST['phone'], $_POST['license_number'], $_POST['license_expiry'], 
-            $_POST['experience_years'], $driver_id
-        ]);
-        $message = 'Profile updated successfully!';
+        if (isset($_POST['update_profile'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET phone = ?, license_number = ?, license_expiry = ?, experience_years = ? WHERE id = ?");
+            $stmt->execute([
+                $_POST['phone'], $_POST['license_number'], $_POST['license_expiry'],
+                $_POST['experience_years'], $driver_id
+            ]);
+            $message = 'Profile updated successfully!';
+        } elseif (isset($_POST['archive_driver'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET status = 'archived' WHERE id = ?");
+            $stmt->execute([$driver_id]);
+            header("Location: drivers.php?message=Driver archived");
+            exit;
+        } elseif (isset($_POST['restore_driver'])) {
+            $stmt = $pdo->prepare("UPDATE drivers SET status = 'active' WHERE id = ?");
+            $stmt->execute([$driver_id]);
+            $message = 'Driver restored successfully!';
+        }
     }
 
     // Get driver info
@@ -30,12 +41,8 @@ try {
     $driver = $stmt->fetch();
 
     if (!$driver) {
-        // Mock data if not found
-        $driver = [
-            'id' => 1, 'first_name' => 'Johnathan', 'last_name' => 'Doe', 'employee_id' => 'DRV-99284',
-            'status' => 'active', 'phone' => '+1 (555) 012-3456', 'email' => 'johnathan.doe@example.com',
-            'license_number' => 'ABC123456789', 'license_expiry' => '2028-10-15', 'experience_years' => 8
-        ];
+        header("Location: drivers.php");
+        exit;
     }
 
 } catch (PDOException $e) {
@@ -57,7 +64,9 @@ try {
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-32 admin-content">
-            <form method="POST" class="max-w-2xl mx-auto">
+            <div class="max-w-2xl mx-auto">
+            <form method="POST">
+                <input type="hidden" name="update_profile" value="1">
                 <div class="flex flex-col items-center mb-12">
                     <div class="size-32 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden mb-4 relative group">
                         <img src="https://ui-avatars.com/api/?name=<?= $driver['first_name'] ?>+<?= $driver['last_name'] ?>&size=128" class="w-full h-full object-cover">
@@ -110,9 +119,29 @@ try {
 
                 <div class="flex gap-4">
                     <button type="submit" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all active:scale-95">Save Changes</button>
-                    <button type="button" class="px-8 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-4 rounded-2xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Archive</button>
                 </div>
             </form>
+
+            <div class="mt-4 flex gap-4">
+                <?php if ($driver['status'] !== 'archived'): ?>
+                    <form method="POST" onsubmit="return confirm('Archive this driver?');" class="flex-1">
+                        <input type="hidden" name="archive_driver" value="1">
+                        <button type="submit" class="w-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-4 rounded-2xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Archive Driver</button>
+                    </form>
+                <?php else: ?>
+                    <form method="POST" onsubmit="return confirm('Restore this driver?');" class="flex-1">
+                        <input type="hidden" name="restore_driver" value="1">
+                        <button type="submit" class="w-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 py-4 rounded-2xl font-bold hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-colors">Restore Driver</button>
+                    </form>
+                <?php endif; ?>
+
+                <form method="POST" action="drivers.php" onsubmit="return confirm('Permanently delete this driver? This cannot be undone.');" class="flex-1">
+                    <input type="hidden" name="driver_id" value="<?= $driver['id'] ?>">
+                    <input type="hidden" name="delete_driver" value="1">
+                    <button type="submit" class="w-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 py-4 rounded-2xl font-bold hover:bg-rose-200 dark:hover:bg-rose-800 transition-colors">Delete Permanently</button>
+                </form>
+            </div>
+            </div>
         </main>
     </div>
 </div>

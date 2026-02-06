@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS drivers (
     emergency_contact VARCHAR(20),
     emergency_name VARCHAR(100),
     experience_years INT DEFAULT 0,
-    status ENUM('active', 'inactive', 'suspended', 'on_leave') DEFAULT 'active',
+    status ENUM('active', 'inactive', 'suspended', 'on_leave', 'archived') DEFAULT 'active',
     hire_date DATE NOT NULL,
     assigned_vehicle_id INT,
     rating DECIMAL(3,2) DEFAULT 0,
