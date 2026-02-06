@@ -14,6 +14,7 @@ try {
     $pdo = getDBConnection();
     
     // Get query parameters
+    $id = $_GET['id'] ?? null;
     $status = $_GET['status'] ?? 'available';
     $vehicle_type = $_GET['type'] ?? null;
     $search = $_GET['search'] ?? null;
@@ -25,7 +26,10 @@ try {
     $conditions = [];
     $params = [];
     
-    if ($status) {
+    if ($id) {
+        $conditions[] = "id = ?";
+        $params[] = $id;
+    } elseif ($status) {
         $conditions[] = "status = ?";
         $params[] = $status;
     }

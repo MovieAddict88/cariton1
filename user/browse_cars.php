@@ -298,19 +298,19 @@ function renderVehicles() {
         
         return `
             <div class="flex flex-col bg-white dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50 hover:shadow-md transition-shadow">
-                <div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("${imageUrl}");'>
+                <a href="vehicle_details.php?id=${vehicle.id}" class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover block" style='background-image: url("${imageUrl}");'>
                     ${isFeatured ? `
                     <div class="absolute top-2 left-2 flex items-center gap-1 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2 py-1 rounded-full border border-rating-gold/30 shadow-sm">
                         <span class="material-symbols-outlined text-[14px] text-rating-gold fill-1">star</span>
                         <span class="text-[10px] font-bold text-slate-800 dark:text-white uppercase tracking-tight">Top Rated</span>
                     </div>
                     ` : ''}
-                    <button class="absolute top-2 right-2 size-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/30 transition-colors">
+                    <button type="button" class="absolute top-2 right-2 size-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/30 transition-colors" onclick="event.preventDefault(); /* Handle favorite toggle here if needed */">
                         <span class="material-symbols-outlined text-lg">favorite</span>
                     </button>
-                </div>
+                </a>
                 <div class="p-3">
-                    <p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1" title="${vehicleName}">${vehicleName}</p>
+                    <a href="vehicle_details.php?id=${vehicle.id}" class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1 hover:text-primary transition-colors block" title="${vehicleName}">${vehicleName}</a>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">${vehicle.year} • ${vehicle.fuel_type} • ${vehicle.seats} seats</p>
                     <p class="text-primary text-sm font-bold mb-2">₱${parseFloat(vehicle.daily_rate).toFixed(2)}<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
                     <a href="checkout_summary.html?vehicle=${vehicle.id}" class="block w-full text-center py-2 bg-primary text-white text-xs font-semibold rounded-lg hover:bg-primary/90 transition-colors">Book Now</a>

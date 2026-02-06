@@ -173,9 +173,9 @@ async function loadFeaturedCars() {
 
             container.innerHTML = data.data.map(vehicle => `
                 <div class="flex flex-col bg-white dark:bg-[#192633] rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800/50 hover:shadow-md transition-shadow">
-                    <div class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover" style='background-image: url("${vehicle.display_image}");'></div>
+                    <a href="vehicle_details.php?id=${vehicle.id}" class="relative w-full aspect-[4/3] bg-slate-200 dark:bg-slate-800 bg-center bg-no-repeat bg-cover block" style='background-image: url("${vehicle.display_image}");'></a>
                     <div class="p-3">
-                        <p class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1">${vehicle.make} ${vehicle.model}</p>
+                        <a href="vehicle_details.php?id=${vehicle.id}" class="text-slate-900 dark:text-white text-base font-bold leading-tight mb-1 block hover:text-primary transition-colors">${vehicle.make} ${vehicle.model}</a>
                         <p class="text-primary text-sm font-bold mb-2">₱${parseFloat(vehicle.daily_rate).toFixed(2)}<span class="text-slate-500 dark:text-slate-400 font-normal">/day</span></p>
                         <a href="checkout_summary.html?vehicle=${vehicle.id}" class="text-xs font-semibold text-primary">Book Now →</a>
                     </div>
