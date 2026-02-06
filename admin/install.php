@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
     daily_rate DECIMAL(10,2) NOT NULL,
     images JSON,
     features JSON,
-    status ENUM('available', 'rented', 'maintenance', 'out_of_service') DEFAULT 'available',
+    status ENUM('available', 'rented', 'reserved', 'maintenance', 'out_of_service') DEFAULT 'available',
     mileage INT DEFAULT 0,
     last_service_date DATE,
     next_service_date DATE,
@@ -254,6 +254,30 @@ CREATE TABLE IF NOT EXISTS settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Company Information Table
+CREATE TABLE IF NOT EXISTS company_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_name VARCHAR(255),
+    address TEXT,
+    phone VARCHAR(50),
+    email VARCHAR(255),
+    business_hours VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Pricing Settings Table
+CREATE TABLE IF NOT EXISTS pricing_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_type VARCHAR(50) UNIQUE,
+    base_price DECIMAL(10,2),
+    price_per_hour DECIMAL(10,2),
+    late_fee DECIMAL(10,2),
+    cleaning_fee DECIMAL(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Activity Log Table
 CREATE TABLE IF NOT EXISTS activity_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -311,6 +335,29 @@ CREATE TABLE IF NOT EXISTS notifications (
             $stmt->execute($setting);
         }
         
+        // Insert default company info
+        $stmt = $pdo->prepare("INSERT INTO company_info (id, company_name, address, phone, email, business_hours) VALUES (1, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            'VeloDrive Car Rental Services',
+            '123 Business Avenue, Metro Manila, Philippines',
+            '+63 2 8123 4567',
+            'info@velodrive.com',
+            'Mon-Sun: 6:00 AM - 10:00 PM'
+        ]);
+
+        // Insert default pricing settings
+        $pricing = [
+            ['sedan', 1500.00, 200.00, 300.00, 150.00],
+            ['suv', 2500.00, 350.00, 500.00, 250.00],
+            ['luxury', 5000.00, 750.00, 1000.00, 500.00],
+            ['electric', 2000.00, 300.00, 450.00, 200.00],
+        ];
+
+        foreach ($pricing as $p) {
+            $stmt = $pdo->prepare("INSERT INTO pricing_settings (setting_type, base_price, price_per_hour, late_fee, cleaning_fee) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute($p);
+        }
+
         // Insert sample vehicles
         $vehicles = [
             ['Tesla', 'Model 3', 2023, 'White', 'ABC-1234', 'electric', 'automatic', 'electric', 5, 85.00],

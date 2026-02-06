@@ -2,7 +2,7 @@
 /**
  * Bookings API Endpoint
  * GET - Get user's bookings
- * POST - Create new booking
+ * POST - Create new booking or Cancel booking
  */
 
 header('Content-Type: application/json');
@@ -19,7 +19,7 @@ require_once '../admin/includes/config.php';
 // GET - Retrieve user's bookings
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        $user_id = $_GET['user_id'] ?? null;
+        $user_id = $_GET['user_id'] ?? $_SESSION['user_id'] ?? null;
         $booking_id = $_GET['booking_id'] ?? null;
         
         if (!$user_id && !$booking_id) {
@@ -99,28 +99,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-// POST - Create new booking
+// POST - Create or Cancel booking
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            $input = $_POST;
+        }
         
-        $user_id = $input['user_id'] ?? null;
+        $pdo = getDBConnection();
+
+        // Handle Cancellation
+        if (isset($input['action']) && $input['action'] === 'cancel') {
+            $booking_id = $input['booking_id'] ?? null;
+            $user_id = $_SESSION['user_id'] ?? $input['user_id'] ?? null;
+
+            if (!$booking_id || !$user_id) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Booking ID and User ID are required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("SELECT id, vehicle_id FROM bookings WHERE id = ? AND user_id = ? AND booking_status IN ('pending', 'confirmed')");
+            $stmt->execute([$booking_id, $user_id]);
+            $booking = $stmt->fetch();
+
+            if (!$booking) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'error' => 'Booking not found or cannot be cancelled']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("UPDATE bookings SET booking_status = 'cancelled' WHERE id = ?");
+            $stmt->execute([$booking_id]);
+
+            $stmt = $pdo->prepare("UPDATE vehicles SET status = 'available' WHERE id = ?");
+            $stmt->execute([$booking['vehicle_id']]);
+
+            echo json_encode(['success' => true, 'message' => 'Booking cancelled successfully']);
+            exit;
+        }
+
+        // Create new booking
+        $user_id = $input['user_id'] ?? $_SESSION['user_id'] ?? null;
         $vehicle_id = $input['vehicle_id'] ?? null;
         $pickup_date = $input['pickup_date'] ?? null;
         $dropoff_date = $input['dropoff_date'] ?? null;
         $pickup_location = $input['pickup_location'] ?? '';
         $dropoff_location = $input['dropoff_location'] ?? '';
         
-        // Validation
         if (!$user_id || !$vehicle_id || !$pickup_date || !$dropoff_date) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Missing required fields']);
             exit;
         }
         
-        $pdo = getDBConnection();
-        
-        // Get vehicle details
         $stmt = $pdo->prepare("SELECT * FROM vehicles WHERE id = ? AND status = 'available'");
         $stmt->execute([$vehicle_id]);
         $vehicle = $stmt->fetch();
@@ -131,22 +164,19 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        // Calculate rental days and total
         $pickup = new DateTime($pickup_date);
         $dropoff = new DateTime($dropoff_date);
         $days = max(1, $dropoff->diff($pickup)->days);
         
         $daily_rate = floatval($vehicle['daily_rate']);
         $subtotal = $daily_rate * $days;
-        $insurance = $subtotal * 0.075; // 7.5% insurance
-        $service_fee = $subtotal * 0.02; // 2% service fee
+        $insurance = $subtotal * 0.075;
+        $service_fee = $subtotal * 0.02;
         $total_amount = $subtotal + $insurance + $service_fee;
-        $downpayment = $total_amount * 0.20; // 20% downpayment
+        $downpayment = $total_amount * 0.20;
         
-        // Generate reference number
         $reference_number = 'BK-' . strtoupper(bin2hex(random_bytes(4)));
         
-        // Create booking
         $stmt = $pdo->prepare("
             INSERT INTO bookings (
                 reference_number, user_id, vehicle_id, pickup_date, dropoff_date, 
@@ -164,8 +194,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $booking_id = $pdo->lastInsertId();
         
-        // Update vehicle status
-        $stmt = $pdo->prepare("UPDATE vehicles SET status = 'rented' WHERE id = ?");
+        // IMPROVEMENT: Set vehicle status to 'reserved' to prevent double booking
+        // but not 'rented' yet as it is not yet active.
+        $stmt = $pdo->prepare("UPDATE vehicles SET status = 'reserved' WHERE id = ?");
         $stmt->execute([$vehicle_id]);
         
         echo json_encode([
@@ -175,11 +206,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'booking_id' => $booking_id,
                 'reference_number' => $reference_number,
                 'total_amount' => $total_amount,
-                'downpayment_amount' => $downpayment,
-                'rental_days' => $days,
-                'subtotal' => $subtotal,
-                'insurance_fee' => $insurance,
-                'service_fee' => $service_fee
+                'downpayment_amount' => $downpayment
             ]
         ]);
         

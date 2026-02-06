@@ -119,9 +119,14 @@
 <span class="material-symbols-outlined" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">arrow_back</span>
 </a>
 <h2 class="font-bold leading-tight tracking-tight flex-1 text-center" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">Browse Cars</h2>
-<a href="index.html" class="flex items-center justify-end" style="width: clamp(2rem, 5vw, 2.5rem);">
+<div class="flex items-center gap-2 justify-end" style="width: clamp(4rem, 10vw, 6rem);">
+<a href="index.html" class="flex items-center justify-center">
 <span class="material-symbols-outlined cursor-pointer" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">home</span>
 </a>
+<a href="profile.php" class="flex items-center justify-center">
+<span class="material-symbols-outlined cursor-pointer" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">account_circle</span>
+</a>
+</div>
 </div>
 </header>
 <main class="max-w-7xl mx-auto pb-24 lg:pb-32 xl:pb-36">
