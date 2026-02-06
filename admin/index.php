@@ -56,10 +56,11 @@ try {
                          ORDER BY b.created_at DESC LIMIT 5");
     $recent_bookings = $stmt->fetchAll();
     
-    // Recent payments
+    // Recent payments (Pending only)
     $stmt = $pdo->query("SELECT p.*, b.reference_number as booking_ref 
                          FROM payments p 
                          LEFT JOIN bookings b ON p.booking_id = b.id 
+                         WHERE p.status = 'pending'
                          ORDER BY p.created_at DESC LIMIT 5");
     $recent_payments = $stmt->fetchAll();
     
