@@ -257,13 +257,13 @@
                     <span class="text-sm text-slate-500">Min Price (₱)</span>
                     <span id="minPriceDisplay" class="text-sm font-bold text-primary">0</span>
                 </div>
-                <input type="range" id="minPriceInput" min="0" max="10000" step="100" value="0" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
+                <input type="range" id="minPriceInput" min="0" max="50000" step="500" value="0" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
 
                 <div class="flex justify-between">
                     <span class="text-sm text-slate-500">Max Price (₱)</span>
-                    <span id="maxPriceDisplay" class="text-sm font-bold text-primary">10000</span>
+                    <span id="maxPriceDisplay" class="text-sm font-bold text-primary">50000+</span>
                 </div>
-                <input type="range" id="maxPriceInput" min="0" max="10000" step="100" value="10000" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
+                <input type="range" id="maxPriceInput" min="0" max="50000" step="500" value="50000" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
             </div>
         </div>
         <hr class="border-slate-100 dark:border-slate-800">
@@ -375,7 +375,7 @@ let filteredVehicles = [];
 let currentCategory = 'all';
 let searchQuery = '';
 let minPrice = 0;
-let maxPrice = 10000;
+let maxPrice = 50000;
 let selectedTransmission = 'all';
 let featuredOnly = false;
 
@@ -402,16 +402,21 @@ function closeFilters() {
 
 function resetFilters() {
     document.getElementById('minPriceInput').value = 0;
-    document.getElementById('maxPriceInput').value = 10000;
+    document.getElementById('maxPriceInput').value = 50000;
     document.getElementById('minPriceDisplay').textContent = '0';
-    document.getElementById('maxPriceDisplay').textContent = '10000';
+    document.getElementById('maxPriceDisplay').textContent = '50000+';
     document.querySelector('input[name="transmission"][value="all"]').checked = true;
     document.getElementById('featuredFilter').checked = false;
 
     minPrice = 0;
-    maxPrice = 10000;
+    maxPrice = 50000;
     selectedTransmission = 'all';
     featuredOnly = false;
+
+    // Clear search and category too for a full reset
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    filterByCategory('all');
 
     applyFilters();
 }
@@ -425,7 +430,7 @@ document.getElementById('minPriceInput').addEventListener('input', (e) => {
 
 document.getElementById('maxPriceInput').addEventListener('input', (e) => {
     maxPrice = parseInt(e.target.value);
-    document.getElementById('maxPriceDisplay').textContent = maxPrice;
+    document.getElementById('maxPriceDisplay').textContent = maxPrice >= 50000 ? '50000+' : maxPrice;
 });
 
 document.querySelectorAll('input[name="transmission"]').forEach(radio => {
@@ -588,7 +593,9 @@ function applyFilters() {
 
         // Price filter
         const price = parseFloat(vehicle.daily_rate);
-        if (price < minPrice || price > maxPrice) {
+        if (price < minPrice) return false;
+        // If maxPrice is at 50000, consider it "No Limit"
+        if (maxPrice < 50000 && price > maxPrice) {
             return false;
         }
 

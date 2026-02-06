@@ -12,8 +12,6 @@ try {
     $column = $stmt->fetch();
 
     if ($column && strpos($column['Type'], "'archived'") === false) {
-        // Current ENUM doesn't have 'archived'. We need to add it.
-        // column['Type'] looks like: enum('active','inactive','suspended','on_leave')
         $currentType = $column['Type'];
         $newType = str_replace(")", ",'archived')", $currentType);
         $pdo->exec("ALTER TABLE drivers MODIFY COLUMN status $newType");
@@ -37,8 +35,15 @@ try {
         UNIQUE KEY (user_id, vehicle_id)
     )");
 
+    // 4. Ensure is_featured column exists in vehicles table
+    $stmt = $pdo->query("SHOW COLUMNS FROM vehicles LIKE 'is_featured'");
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE vehicles ADD COLUMN is_featured TINYINT(1) DEFAULT 0 AFTER status");
+        // Mark some vehicles as featured by default if any exist
+        $pdo->exec("UPDATE vehicles SET is_featured = 1 LIMIT 3");
+    }
+
 } catch (Exception $e) {
-    // We fail silently to avoid breaking the UI, but in a real app we'd log this.
     error_log("Migration failed: " . $e->getMessage());
 }
 ?>
