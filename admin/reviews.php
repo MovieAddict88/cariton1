@@ -94,15 +94,15 @@ try {
             <!-- Bulk Actions -->
             <?php if (!empty($reviews)): ?>
                 <div class="bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 mb-6 shadow-sm">
-                    <form method="POST" class="flex items-center gap-4">
+                    <form id="bulkActionsForm" method="POST" class="flex items-center gap-4">
                         <input type="hidden" name="bulk_action" value="1">
-                        <select name="bulk_action_type" class="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-bold">
+                        <select name="bulk_action_type" class="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-bold bg-transparent">
                             <option value="">Bulk Actions</option>
                             <option value="approve">Approve Selected</option>
                             <option value="flag">Flag Selected</option>
                             <option value="delete">Delete Selected</option>
                         </select>
-                        <button type="submit" onclick="return confirm('Are you sure?')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold">
+                        <button type="submit" onclick="return confirm('Are you sure?')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold cursor-pointer">
                             Apply
                         </button>
                     </form>
@@ -146,40 +146,48 @@ try {
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <form method="POST">
-                        <input type="hidden" name="bulk_action" value="1">
-                        <?php foreach ($reviews as $r): ?>
-                            <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-4">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <input type="checkbox" name="selected_reviews[]" value="<?= $r['id'] ?>" class="rounded">
-                                        <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                                            <?= substr($r['first_name'] ?? 'U', 0, 1) ?>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-sm"><?= htmlspecialchars(($r['first_name'] ?? 'User') . ' ' . ($r['last_name'] ?? '')) ?></h4>
-                                            <p class="text-xs text-slate-500"><?= htmlspecialchars($r['make'] . ' ' . $r['model']) ?> • <?= date('M d, Y', strtotime($r['created_at'])) ?></p>
-                                        </div>
+                    <?php foreach ($reviews as $r): ?>
+                        <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-4">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" name="selected_reviews[]" value="<?= $r['id'] ?>" form="bulkActionsForm" class="rounded cursor-pointer">
+                                    <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                                        <?= substr($r['first_name'] ?? 'U', 0, 1) ?>
                                     </div>
-                                    <div class="flex items-center gap-1 text-amber-500 font-bold">
-                                        <span class="material-symbols-outlined text-sm fill-1">star</span>
-                                        <?= number_format($r['overall_rating'], 1) ?>
+                                    <div>
+                                        <h4 class="font-bold text-sm"><?= htmlspecialchars(($r['first_name'] ?? 'User') . ' ' . ($r['last_name'] ?? '')) ?></h4>
+                                        <p class="text-xs text-slate-500"><?= htmlspecialchars($r['make'] . ' ' . $r['model']) ?> • <?= date('M d, Y', strtotime($r['created_at'])) ?></p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 italic">"<?= htmlspecialchars($r['vehicle_comment']) ?>"</p>
-                                <div class="flex gap-2">
-                                    <input type="hidden" name="review_id" value="<?= $r['id'] ?>">
-                                    <?php if ($r['status'] !== 'published'): ?>
-                                        <button type="submit" name="update_status" value="published" class="px-4 py-2 bg-emerald-500 text-white text-xs font-bold rounded-lg">Publish</button>
-                                    <?php endif; ?>
-                                    <?php if ($r['status'] !== 'flagged'): ?>
-                                        <button type="submit" name="update_status" value="flagged" class="px-4 py-2 bg-orange-500 text-white text-xs font-bold rounded-lg">Flag</button>
-                                    <?php endif; ?>
-                                    <button type="submit" name="delete_review" onclick="return confirm('Delete this review?')" class="px-4 py-2 text-rose-500 text-xs font-bold rounded-lg hover:bg-rose-500/10">Delete</button>
+                                <div class="flex items-center gap-1 text-amber-500 font-bold">
+                                    <span class="material-symbols-outlined text-sm fill-1">star</span>
+                                    <?= number_format($r['overall_rating'], 1) ?>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    </form>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 italic">"<?= htmlspecialchars($r['vehicle_comment']) ?>"</p>
+
+                            <div class="flex gap-2">
+                                <?php if ($r['status'] !== 'published'): ?>
+                                    <form method="POST" class="inline">
+                                        <input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+                                        <button type="submit" name="update_status" value="published" class="px-4 py-2 bg-emerald-500 text-white text-xs font-bold rounded-lg cursor-pointer">Publish</button>
+                                    </form>
+                                <?php endif; ?>
+
+                                <?php if ($r['status'] !== 'flagged'): ?>
+                                    <form method="POST" class="inline">
+                                        <input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+                                        <button type="submit" name="update_status" value="flagged" class="px-4 py-2 bg-orange-500 text-white text-xs font-bold rounded-lg cursor-pointer">Flag</button>
+                                    </form>
+                                <?php endif; ?>
+
+                                <form method="POST" class="inline">
+                                    <input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+                                    <button type="submit" name="delete_review" onclick="return confirm('Delete this review?')" class="px-4 py-2 text-rose-500 text-xs font-bold rounded-lg hover:bg-rose-500/10 cursor-pointer">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </main>

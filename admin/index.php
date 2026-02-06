@@ -28,6 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_payment'])) {
     }
 }
 
+// Handle rejection from dashboard
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_payment'])) {
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("UPDATE payments SET status = 'rejected' WHERE id = ?");
+        $stmt->execute([$_POST['payment_id']]);
+        $success_message = 'Payment rejected!';
+    } catch (PDOException $e) {
+        $error_message = 'Error rejecting payment: ' . $e->getMessage();
+    }
+}
+
 // Get dashboard statistics
 try {
     $pdo = getDBConnection();
@@ -267,7 +279,7 @@ try {
                 <div class="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                         <h2 class="text-lg font-bold">Pending Approvals</h2>
-                        <a href="payments.php" class="text-primary text-sm font-bold">View All</a>
+                        <a href="payments.php?status=pending" class="text-primary text-sm font-bold">View All</a>
                     </div>
                     <div class="divide-y divide-slate-100 dark:divide-slate-800">
                         <?php if(empty($recent_payments)): ?>
@@ -289,10 +301,16 @@ try {
                                             <p class="font-bold text-sm"><?= formatCurrency(convertCurrency($payment['amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
                                         </div>
                                         <?php if ($payment['status'] === 'pending'): ?>
-                                            <form method="POST">
-                                                <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
-                                                <button type="submit" name="verify_payment" class="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors">Approve</button>
-                                            </form>
+                                            <div class="flex gap-2">
+                                                <form method="POST">
+                                                    <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
+                                                    <button type="submit" name="verify_payment" class="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors cursor-pointer">Approve</button>
+                                                </form>
+                                                <form method="POST">
+                                                    <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
+                                                    <button type="submit" name="reject_payment" class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg hover:bg-rose-600 transition-colors cursor-pointer">Reject</button>
+                                                </form>
+                                            </div>
                                         <?php else: ?>
                                             <span class="text-[10px] font-bold uppercase text-slate-400">Verified</span>
                                         <?php endif; ?>
