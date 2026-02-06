@@ -25,12 +25,31 @@ try {
         $message = 'Payment verified and booking confirmed!';
     }
 
+    // Handle rejection
+    if (isset($_POST['reject_payment'])) {
+        $stmt = $pdo->prepare("UPDATE payments SET status = 'rejected' WHERE id = ?");
+        $stmt->execute([$_POST['payment_id']]);
+        $message = 'Payment rejected!';
+    }
+
     // Get payments
-    $stmt = $pdo->query("SELECT p.*, b.reference_number as booking_ref, u.first_name, u.last_name 
-                         FROM payments p 
-                         LEFT JOIN bookings b ON p.booking_id = b.id 
-                         LEFT JOIN users u ON b.user_id = u.id 
-                         ORDER BY p.created_at DESC");
+    $status_filter = $_GET['status'] ?? '';
+    $query = "SELECT p.*, b.reference_number as booking_ref, u.first_name, u.last_name
+              FROM payments p
+              LEFT JOIN bookings b ON p.booking_id = b.id
+              LEFT JOIN users u ON b.user_id = u.id";
+
+    if ($status_filter) {
+        $query .= " WHERE p.status = :status";
+    }
+
+    $query .= " ORDER BY p.created_at DESC";
+
+    $stmt = $pdo->prepare($query);
+    if ($status_filter) {
+        $stmt->bindParam(':status', $status_filter);
+    }
+    $stmt->execute();
     $payments = $stmt->fetchAll();
 
 } catch (PDOException $e) {
@@ -53,6 +72,14 @@ try {
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 admin-content">
+            <!-- Filter Tabs -->
+            <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
+                <a href="payments.php" class="px-4 py-2 rounded-full text-xs font-bold transition-colors <?= empty($status_filter) ? 'bg-primary text-white' : 'bg-white dark:bg-surface-dark text-slate-500 border border-slate-200 dark:border-slate-800' ?>">All</a>
+                <a href="payments.php?status=pending" class="px-4 py-2 rounded-full text-xs font-bold transition-colors <?= $status_filter === 'pending' ? 'bg-orange-500 text-white' : 'bg-white dark:bg-surface-dark text-slate-500 border border-slate-200 dark:border-slate-800' ?>">Pending</a>
+                <a href="payments.php?status=verified" class="px-4 py-2 rounded-full text-xs font-bold transition-colors <?= $status_filter === 'verified' ? 'bg-emerald-500 text-white' : 'bg-white dark:bg-surface-dark text-slate-500 border border-slate-200 dark:border-slate-800' ?>">Verified</a>
+                <a href="payments.php?status=rejected" class="px-4 py-2 rounded-full text-xs font-bold transition-colors <?= $status_filter === 'rejected' ? 'bg-rose-500 text-white' : 'bg-white dark:bg-surface-dark text-slate-500 border border-slate-200 dark:border-slate-800' ?>">Rejected</a>
+            </div>
+
             <?php if ($message): ?>
                 <div class="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6">
                     <?= htmlspecialchars($message) ?>
@@ -110,9 +137,12 @@ try {
                                 <?php if ($p['status'] === 'pending'): ?>
                                     <form method="POST" class="flex-1">
                                         <input type="hidden" name="payment_id" value="<?= $p['id'] ?>">
-                                        <button type="submit" name="verify_payment" class="w-full bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors">Verify Payment</button>
+                                        <button type="submit" name="verify_payment" class="w-full bg-primary text-white py-2 rounded-lg text-xs font-bold hover:bg-primary/90 transition-colors cursor-pointer">Verify</button>
                                     </form>
-                                    <button class="flex-1 border border-slate-200 dark:border-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-rose-500">Reject</button>
+                                    <form method="POST" class="flex-1">
+                                        <input type="hidden" name="payment_id" value="<?= $p['id'] ?>">
+                                        <button type="submit" name="reject_payment" class="w-full border border-slate-200 dark:border-slate-800 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors text-rose-500 cursor-pointer">Reject</button>
+                                    </form>
                                 <?php else: ?>
                                     <button disabled class="w-full bg-slate-100 dark:bg-slate-800 text-slate-400 py-2 rounded-lg text-xs font-bold cursor-not-allowed">Verified on <?= date('M d, Y', strtotime($p['verified_at'])) ?></button>
                                 <?php endif; ?>

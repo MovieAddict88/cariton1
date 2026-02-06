@@ -7,6 +7,39 @@
 $page_title = 'Dashboard';
 require_once 'includes/header.php';
 
+$success_message = '';
+$error_message = '';
+
+// Handle verification from dashboard
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_payment'])) {
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("UPDATE payments SET status = 'verified', verified_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $stmt->execute([$_POST['payment_id']]);
+
+        // Also update booking status if it was pending downpayment
+        $stmt = $pdo->prepare("UPDATE bookings SET downpayment_paid = 1, booking_status = 'confirmed'
+                             WHERE id = (SELECT booking_id FROM payments WHERE id = ?)");
+        $stmt->execute([$_POST['payment_id']]);
+
+        $success_message = 'Payment verified successfully!';
+    } catch (PDOException $e) {
+        $error_message = 'Error verifying payment: ' . $e->getMessage();
+    }
+}
+
+// Handle rejection from dashboard
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_payment'])) {
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("UPDATE payments SET status = 'rejected' WHERE id = ?");
+        $stmt->execute([$_POST['payment_id']]);
+        $success_message = 'Payment rejected!';
+    } catch (PDOException $e) {
+        $error_message = 'Error rejecting payment: ' . $e->getMessage();
+    }
+}
+
 // Get dashboard statistics
 try {
     $pdo = getDBConnection();
@@ -35,10 +68,11 @@ try {
                          ORDER BY b.created_at DESC LIMIT 5");
     $recent_bookings = $stmt->fetchAll();
     
-    // Recent payments
+    // Recent payments (Pending only)
     $stmt = $pdo->query("SELECT p.*, b.reference_number as booking_ref 
                          FROM payments p 
                          LEFT JOIN bookings b ON p.booking_id = b.id 
+                         WHERE p.status = 'pending'
                          ORDER BY p.created_at DESC LIMIT 5");
     $recent_payments = $stmt->fetchAll();
     
@@ -101,6 +135,18 @@ try {
                 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Welcome back, Administrator</p>
                 <h1 class="text-2xl font-bold dark:text-white">System Status</h1>
             </div>
+
+            <?php if ($success_message): ?>
+                <div class="mx-4 lg:mx-0 mt-4 bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl">
+                    <?= htmlspecialchars($success_message) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error_message): ?>
+                <div class="mx-4 lg:mx-0 mt-4 bg-rose-100 dark:bg-rose-900/30 border border-rose-400 text-rose-700 dark:text-rose-300 px-4 py-3 rounded-xl">
+                    <?= htmlspecialchars($error_message) ?>
+                </div>
+            <?php endif; ?>
 
             <!-- Stats Section -->
             <div class="flex overflow-x-auto gap-4 p-4 no-scrollbar lg:px-0 lg:grid lg:grid-cols-4 lg:overflow-visible">
@@ -233,7 +279,7 @@ try {
                 <div class="bg-white dark:bg-surface-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                         <h2 class="text-lg font-bold">Pending Approvals</h2>
-                        <a href="payments.php" class="text-primary text-sm font-bold">View All</a>
+                        <a href="payments.php?status=pending" class="text-primary text-sm font-bold">View All</a>
                     </div>
                     <div class="divide-y divide-slate-100 dark:divide-slate-800">
                         <?php if(empty($recent_payments)): ?>
@@ -254,7 +300,20 @@ try {
                                         <div class="text-right">
                                             <p class="font-bold text-sm"><?= formatCurrency(convertCurrency($payment['amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
                                         </div>
-                                        <button class="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-lg">Approve</button>
+                                        <?php if ($payment['status'] === 'pending'): ?>
+                                            <div class="flex gap-2">
+                                                <form method="POST">
+                                                    <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
+                                                    <button type="submit" name="verify_payment" class="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors cursor-pointer">Approve</button>
+                                                </form>
+                                                <form method="POST">
+                                                    <input type="hidden" name="payment_id" value="<?= $payment['id'] ?>">
+                                                    <button type="submit" name="reject_payment" class="bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg hover:bg-rose-600 transition-colors cursor-pointer">Reject</button>
+                                                </form>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="text-[10px] font-bold uppercase text-slate-400">Verified</span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
