@@ -1,6 +1,7 @@
 <?php
 // admin/includes/header.php
 require_once 'config.php';
+require_once 'migrations.php';
 if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) !== 'login.php') {
     redirect('login.php');
 }
