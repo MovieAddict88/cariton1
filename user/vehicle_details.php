@@ -66,6 +66,9 @@
                     <span class="material-symbols-outlined text-[18px] text-rating-gold fill-1">star</span>
                     <span class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-tight">Top Rated</span>
                 </div>
+                <button id="favoriteBtn" class="absolute top-4 right-4 size-12 bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all active:scale-90">
+                    <span class="material-symbols-outlined text-2xl">favorite</span>
+                </button>
             </div>
 
             <!-- Thumbnail List (if multiple images) -->
@@ -149,9 +152,45 @@
             }
         }
 
+        async function toggleFavorite(vehicleId, button) {
+            try {
+                const response = await fetch('../api/favorites.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vehicle_id: vehicleId })
+                });
+
+                if (response.status === 401) {
+                    window.location.href = 'user_authentication.html';
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    const icon = button.querySelector('.material-symbols-outlined');
+                    if (data.is_favorited) {
+                        button.classList.add('text-rose-500');
+                        icon.classList.add('fill-1');
+                    } else {
+                        button.classList.remove('text-rose-500');
+                        icon.classList.remove('fill-1');
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+            }
+        }
+
         function displayVehicle(vehicle) {
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('vehicleContent').classList.remove('hidden');
+
+            const favoriteBtn = document.getElementById('favoriteBtn');
+            if (vehicle.is_favorited) {
+                favoriteBtn.classList.add('text-rose-500');
+                favoriteBtn.querySelector('.material-symbols-outlined').classList.add('fill-1');
+            }
+            favoriteBtn.onclick = () => toggleFavorite(vehicle.id, favoriteBtn);
 
             document.title = `${vehicle.make} ${vehicle.model} - VeloDrive`;
             document.getElementById('vehicleName').textContent = `${vehicle.make} ${vehicle.model}`;

@@ -64,8 +64,16 @@ try {
     $countStmt->execute($params);
     $total = $countStmt->fetch()['total'];
     
+    // Check for user login to handle favorites
+    $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+    $favoriteJoin = "";
+    $favoriteSelect = "";
+    if ($user_id) {
+        $favoriteSelect = ", (SELECT 1 FROM favorites WHERE user_id = $user_id AND vehicle_id = vehicles.id) as is_favorited";
+    }
+
     // Get vehicles
-    $query = "SELECT * FROM vehicles {$whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?";
+    $query = "SELECT * $favoriteSelect FROM vehicles {$whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?";
     
     $stmt = $pdo->prepare($query);
     // Explicitly bind limit and offset as integers for better compatibility
@@ -95,7 +103,8 @@ try {
         $vehicle['daily_rate_formatted'] = formatCurrency($vehicle['daily_rate'], DEFAULT_CURRENCY);
         
         // Convert boolean fields
-        $vehicle['is_featured'] = (bool)$vehicle['is_featured'];
+        $vehicle['is_featured'] = (bool)($vehicle['is_featured'] ?? false);
+        $vehicle['is_favorited'] = isset($vehicle['is_favorited']) && $vehicle['is_favorited'] == 1;
     }
     
     // Return response

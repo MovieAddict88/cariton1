@@ -120,9 +120,9 @@
 </a>
 <h2 class="font-bold leading-tight tracking-tight flex-1 text-center" style="font-size: clamp(1rem, 2.5vw, 1.5rem);">Browse Cars</h2>
 <div class="flex items-center gap-2 justify-end" style="width: clamp(4rem, 10vw, 6rem);">
-<a href="index.html" class="flex items-center justify-center">
-<span class="material-symbols-outlined cursor-pointer" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">home</span>
-</a>
+<div class="flex items-center justify-center" onclick="openDrawer()">
+<span class="material-symbols-outlined cursor-pointer" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">menu</span>
+</div>
 <a href="profile.php" class="flex items-center justify-center">
 <span class="material-symbols-outlined cursor-pointer" style="font-size: clamp(1.25rem, 3vw, 1.75rem);">account_circle</span>
 </a>
@@ -140,9 +140,9 @@
 <input id="searchInput" class="form-input flex w-full min-w-0 flex-1 border-none bg-white dark:bg-card-dark focus:ring-0 h-full placeholder:text-slate-400 px-3 rounded-r-xl text-base font-normal" placeholder="Search by brand or model..." value=""/>
 </div>
 </label>
-<a href="search_filters_overlay.html" class="bg-primary text-white flex items-center justify-center size-12 rounded-xl shrink-0 shadow-lg shadow-primary/20">
+<button type="button" onclick="openFilters()" class="bg-primary text-white flex items-center justify-center size-12 rounded-xl shrink-0 shadow-lg shadow-primary/20">
 <span class="material-symbols-outlined">tune</span>
-</a>
+</button>
 </div>
 </div>
 
@@ -227,22 +227,256 @@
 <span class="material-symbols-outlined fill-1">explore</span>
 <span class="text-[10px] mt-1 font-bold">Browse</span>
 </a>
-<a href="my_bookings.html" class="flex flex-col items-center justify-center text-slate-400">
+<a href="my_bookings.php" class="flex flex-col items-center justify-center text-slate-400">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="text-[10px] mt-1 font-medium">Bookings</span>
 </a>
-<a href="user_authentication.html" class="flex flex-col items-center justify-center text-slate-400">
+<a href="profile.php" class="flex flex-col items-center justify-center text-slate-400">
 <span class="material-symbols-outlined">person</span>
 <span class="text-[10px] mt-1 font-medium">Profile</span>
 </a>
 </div>
 </nav>
 
+<!-- Filters Bottom Sheet -->
+<div id="filters-overlay" class="fixed inset-0 bg-black/60 z-[80] hidden transition-opacity duration-300 opacity-0"></div>
+<div id="filters-sheet" class="fixed bottom-0 left-0 right-0 z-[90] bg-background-light dark:bg-[#111a22] rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.5)] transform translate-y-full transition-transform duration-300 ease-in-out max-h-[90%] flex flex-col">
+    <div class="flex flex-col items-center pt-3 pb-1 shrink-0">
+        <div class="h-1.5 w-10 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+    </div>
+    <div class="flex items-center p-4 pt-2 justify-between border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <h2 class="text-xl font-bold">Filters</h2>
+        <button onclick="resetFilters()" class="text-primary font-semibold">Reset</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-6 pb-32">
+        <!-- Price Range -->
+        <div>
+            <h3 class="text-lg font-bold mb-4">Price Range</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between">
+                    <span class="text-sm text-slate-500">Min Price (₱)</span>
+                    <span id="minPriceDisplay" class="text-sm font-bold text-primary">0</span>
+                </div>
+                <input type="range" id="minPriceInput" min="0" max="50000" step="500" value="0" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
+
+                <div class="flex justify-between">
+                    <span class="text-sm text-slate-500">Max Price (₱)</span>
+                    <span id="maxPriceDisplay" class="text-sm font-bold text-primary">50000+</span>
+                </div>
+                <input type="range" id="maxPriceInput" min="0" max="50000" step="500" value="50000" class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-primary">
+            </div>
+        </div>
+        <hr class="border-slate-100 dark:border-slate-800">
+        <!-- Transmission -->
+        <div>
+            <h3 class="text-lg font-bold mb-4">Transmission</h3>
+            <div class="flex gap-4">
+                <label class="flex-1">
+                    <input type="radio" name="transmission" value="all" checked class="hidden peer">
+                    <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-800 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all cursor-pointer font-medium">All</div>
+                </label>
+                <label class="flex-1">
+                    <input type="radio" name="transmission" value="automatic" class="hidden peer">
+                    <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-800 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all cursor-pointer font-medium">Auto</div>
+                </label>
+                <label class="flex-1">
+                    <input type="radio" name="transmission" value="manual" class="hidden peer">
+                    <div class="text-center py-3 rounded-xl border border-slate-200 dark:border-slate-800 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all cursor-pointer font-medium">Manual</div>
+                </label>
+            </div>
+        </div>
+        <hr class="border-slate-100 dark:border-slate-800">
+        <!-- Additional Filters -->
+        <div>
+            <h3 class="text-lg font-bold mb-4">Additional Filters</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <span>Top Rated Only</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="featuredFilter" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 border-t border-slate-100 dark:border-slate-800 shrink-0">
+        <button onclick="closeFilters()" class="w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20">Apply Filters</button>
+    </div>
+</div>
+
+<!-- Navigation Drawer -->
+<div id="drawer-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden transition-opacity duration-300 opacity-0"></div>
+<div id="navigation-drawer" class="fixed top-0 left-0 bottom-0 w-[280px] bg-background-light dark:bg-background-dark z-[70] transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800">
+    <div class="flex flex-col h-full">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+            <h2 class="text-2xl font-bold text-primary">VeloDrive</h2>
+            <p class="text-xs text-slate-500 mt-1">Car Rental Services</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3">
+                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">home</span>
+                    <span class="font-semibold">Home</span>
+                </a>
+                <a href="browse_cars.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">explore</span>
+                    <span class="font-semibold">Browse Cars</span>
+                </a>
+                <a href="my_bookings.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">calendar_today</span>
+                    <span class="font-semibold">My Bookings</span>
+                </a>
+                <a href="favorites.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">favorite</span>
+                    <span class="font-semibold">Favorites</span>
+                </a>
+                <hr class="my-4 border-slate-200 dark:border-slate-800 mx-4">
+                <a href="profile.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">person</span>
+                    <span class="font-semibold">My Profile</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <a href="logout.php" class="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-semibold">Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
+function openDrawer() {
+    const overlay = document.getElementById('drawer-overlay');
+    const drawer = document.getElementById('navigation-drawer');
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.add('opacity-100');
+        drawer.classList.remove('-translate-x-full');
+    }, 10);
+}
+
+function closeDrawer() {
+    const overlay = document.getElementById('drawer-overlay');
+    const drawer = document.getElementById('navigation-drawer');
+    overlay.classList.remove('opacity-100');
+    drawer.classList.add('-translate-x-full');
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, 300);
+}
+
+document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
 let allVehicles = [];
 let filteredVehicles = [];
 let currentCategory = 'all';
 let searchQuery = '';
+let minPrice = 0;
+let maxPrice = 50000;
+let selectedTransmission = 'all';
+let featuredOnly = false;
+
+function openFilters() {
+    const overlay = document.getElementById('filters-overlay');
+    const sheet = document.getElementById('filters-sheet');
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.add('opacity-100');
+        sheet.classList.remove('translate-y-full');
+    }, 10);
+}
+
+function closeFilters() {
+    const overlay = document.getElementById('filters-overlay');
+    const sheet = document.getElementById('filters-sheet');
+    overlay.classList.remove('opacity-100');
+    sheet.classList.add('translate-y-full');
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, 300);
+    applyFilters();
+}
+
+function resetFilters() {
+    document.getElementById('minPriceInput').value = 0;
+    document.getElementById('maxPriceInput').value = 50000;
+    document.getElementById('minPriceDisplay').textContent = '0';
+    document.getElementById('maxPriceDisplay').textContent = '50000+';
+    document.querySelector('input[name="transmission"][value="all"]').checked = true;
+    document.getElementById('featuredFilter').checked = false;
+
+    minPrice = 0;
+    maxPrice = 50000;
+    selectedTransmission = 'all';
+    featuredOnly = false;
+
+    // Clear search and category too for a full reset
+    document.getElementById('searchInput').value = '';
+    searchQuery = '';
+    filterByCategory('all');
+
+    applyFilters();
+}
+
+document.getElementById('filters-overlay').addEventListener('click', closeFilters);
+
+document.getElementById('minPriceInput').addEventListener('input', (e) => {
+    minPrice = parseInt(e.target.value);
+    document.getElementById('minPriceDisplay').textContent = minPrice;
+});
+
+document.getElementById('maxPriceInput').addEventListener('input', (e) => {
+    maxPrice = parseInt(e.target.value);
+    document.getElementById('maxPriceDisplay').textContent = maxPrice >= 50000 ? '50000+' : maxPrice;
+});
+
+document.querySelectorAll('input[name="transmission"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        selectedTransmission = e.target.value;
+    });
+});
+
+document.getElementById('featuredFilter').addEventListener('change', (e) => {
+    featuredOnly = e.target.checked;
+});
+
+async function toggleFavorite(vehicleId, button) {
+    try {
+        const response = await fetch('../api/favorites.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vehicle_id: vehicleId })
+        });
+
+        if (response.status === 401) {
+            window.location.href = 'user_authentication.html';
+            return;
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            const icon = button.querySelector('.material-symbols-outlined');
+            if (data.is_favorited) {
+                button.classList.remove('text-white');
+                button.classList.add('text-rose-500');
+                icon.classList.add('fill-1');
+            } else {
+                button.classList.remove('text-rose-500');
+                button.classList.add('text-white');
+                icon.classList.remove('fill-1');
+            }
+
+            // Update allVehicles state so it stays if we re-render
+            const vehicle = allVehicles.find(v => v.id == vehicleId);
+            if (vehicle) vehicle.is_favorited = data.is_favorited;
+        }
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+    }
+}
 
 // Load vehicles from API
 async function loadVehicles() {
@@ -305,8 +539,8 @@ function renderVehicles() {
                         <span class="text-[10px] font-bold text-slate-800 dark:text-white uppercase tracking-tight">Top Rated</span>
                     </div>
                     ` : ''}
-                    <button type="button" class="absolute top-2 right-2 size-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/30 transition-colors" onclick="event.preventDefault(); /* Handle favorite toggle here if needed */">
-                        <span class="material-symbols-outlined text-lg">favorite</span>
+                    <button type="button" class="absolute top-2 right-2 size-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center ${vehicle.is_favorited ? 'text-rose-500' : 'text-white'} hover:bg-black/30 transition-colors" onclick="event.preventDefault(); toggleFavorite(${vehicle.id}, this)">
+                        <span class="material-symbols-outlined text-lg ${vehicle.is_favorited ? 'fill-1' : ''}">favorite</span>
                     </button>
                 </a>
                 <div class="p-3">
@@ -355,6 +589,24 @@ function applyFilters() {
             if (!vehicleName.includes(searchLower) && !description.includes(searchLower)) {
                 return false;
             }
+        }
+
+        // Price filter
+        const price = parseFloat(vehicle.daily_rate);
+        if (price < minPrice) return false;
+        // If maxPrice is at 50000, consider it "No Limit"
+        if (maxPrice < 50000 && price > maxPrice) {
+            return false;
+        }
+
+        // Transmission filter
+        if (selectedTransmission !== 'all' && vehicle.transmission.toLowerCase() !== selectedTransmission.toLowerCase()) {
+            return false;
+        }
+
+        // Featured filter
+        if (featuredOnly && !vehicle.is_featured) {
+            return false;
         }
         
         return true;

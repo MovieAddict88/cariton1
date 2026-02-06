@@ -89,12 +89,12 @@
 <!-- Top Navigation Bar -->
 <header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
 <div class="flex items-center p-4 justify-between max-w-7xl mx-auto">
-<div class="flex size-10 shrink-0 items-center justify-center">
+<div class="flex size-10 shrink-0 items-center justify-center" onclick="openDrawer()">
 <span class="material-symbols-outlined cursor-pointer">menu</span>
 </div>
 <h2 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center">VeloDrive</h2>
 <div class="flex w-10 items-center justify-end">
-<a href="user_authentication.html" class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary">
+<a href="profile.php" class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary/10 text-primary">
 <span class="material-symbols-outlined">account_circle</span>
 </a>
 </div>
@@ -114,7 +114,7 @@
 </div>
 <span class="text-sm font-bold">Browse Cars</span>
 </a>
-<a href="my_bookings.html" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#192633] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
+<a href="my_bookings.php" class="flex flex-col items-center justify-center p-6 bg-white dark:bg-[#192633] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm active:scale-95 transition-transform">
 <div class="size-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
 <span class="material-symbols-outlined text-primary">confirmation_number</span>
 </div>
@@ -147,17 +147,82 @@
 <span class="material-symbols-outlined">explore</span>
 <span class="text-[10px] mt-1 font-medium">Browse</span>
 </a>
-<a href="my_bookings.html" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+<a href="my_bookings.php" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
 <span class="material-symbols-outlined">calendar_today</span>
 <span class="text-[10px] mt-1 font-medium">Bookings</span>
 </a>
-<a href="user_authentication.html" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
+<a href="profile.php" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
 <span class="material-symbols-outlined">person</span>
 <span class="text-[10px] mt-1 font-medium">Profile</span>
 </a>
 </div>
 </nav>
+
+<!-- Navigation Drawer -->
+<div id="drawer-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden transition-opacity duration-300 opacity-0"></div>
+<div id="navigation-drawer" class="fixed top-0 left-0 bottom-0 w-[280px] bg-background-light dark:bg-background-dark z-[70] transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-slate-200 dark:border-slate-800">
+    <div class="flex flex-col h-full">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+            <h2 class="text-2xl font-bold text-primary">VeloDrive</h2>
+            <p class="text-xs text-slate-500 mt-1">Car Rental Services</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3">
+                <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">home</span>
+                    <span class="font-semibold">Home</span>
+                </a>
+                <a href="browse_cars.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">explore</span>
+                    <span class="font-semibold">Browse Cars</span>
+                </a>
+                <a href="my_bookings.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">calendar_today</span>
+                    <span class="font-semibold">My Bookings</span>
+                </a>
+                <a href="favorites.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">favorite</span>
+                    <span class="font-semibold">Favorites</span>
+                </a>
+                <hr class="my-4 border-slate-200 dark:border-slate-800 mx-4">
+                <a href="profile.php" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-500">person</span>
+                    <span class="font-semibold">My Profile</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <a href="logout.php" class="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="font-semibold">Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
+function openDrawer() {
+    const overlay = document.getElementById('drawer-overlay');
+    const drawer = document.getElementById('navigation-drawer');
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.add('opacity-100');
+        drawer.classList.remove('-translate-x-full');
+    }, 10);
+}
+
+function closeDrawer() {
+    const overlay = document.getElementById('drawer-overlay');
+    const drawer = document.getElementById('navigation-drawer');
+    overlay.classList.remove('opacity-100');
+    drawer.classList.add('-translate-x-full');
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, 300);
+}
+
+document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
 async function loadFeaturedCars() {
     const container = document.getElementById('featuredCars');
     try {
