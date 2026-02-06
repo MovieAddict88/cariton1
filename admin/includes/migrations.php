@@ -26,6 +26,17 @@ try {
         $pdo->exec("UPDATE drivers SET hire_date = CURDATE() WHERE hire_date IS NULL");
     }
 
+    // 3. Ensure favorites table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS favorites (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        vehicle_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+        UNIQUE KEY (user_id, vehicle_id)
+    )");
+
 } catch (Exception $e) {
     // We fail silently to avoid breaking the UI, but in a real app we'd log this.
     error_log("Migration failed: " . $e->getMessage());
