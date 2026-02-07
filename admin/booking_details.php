@@ -18,6 +18,10 @@ require_once 'includes/header.php';
         --fluid-padding: clamp(1rem, 0.8rem + 1vw, 2rem);
     }
     .fluid-p { padding: var(--fluid-padding); }
+    .text-fluid-xs { font-size: var(--fluid-text-xs); }
+    .text-fluid-sm { font-size: var(--fluid-text-sm); }
+    .text-fluid-base { font-size: var(--fluid-text-base); }
+    .text-fluid-lg { font-size: var(--fluid-text-lg); }
     .text-fluid-xl { font-size: var(--fluid-text-xl); }
 </style>
 <?php
@@ -63,14 +67,19 @@ try {
             $stmt = $pdo->prepare("UPDATE bookings SET booking_status = ? WHERE id = ?");
             $stmt->execute([$new_status, $booking_id]);
 
-            // If completed, make vehicle available again
-            if ($new_status === 'completed') {
+            // If completed or cancelled, make vehicle available again
+            if (in_array($new_status, ['completed', 'cancelled', 'no_show'])) {
                 $stmt = $pdo->prepare("UPDATE vehicles SET status = 'available' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
                 $stmt->execute([$booking_id]);
             }
             // If active, mark vehicle as rented
             if ($new_status === 'active') {
                 $stmt = $pdo->prepare("UPDATE vehicles SET status = 'rented' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+            // If confirmed, mark vehicle as reserved
+            if ($new_status === 'confirmed') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'reserved' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
                 $stmt->execute([$booking_id]);
             }
 
@@ -447,6 +456,8 @@ try {
 
                 </div>
             </div>
+            <!-- Extra spacer for mobile scrolling -->
+            <div class="h-32 lg:hidden"></div>
         </main>
     </div>
 </div>

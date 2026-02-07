@@ -60,14 +60,19 @@ try {
             $stmt = $pdo->prepare("UPDATE bookings SET booking_status = ? WHERE id = ?");
             $stmt->execute([$status, $booking_id]);
 
-            // If completed, make vehicle available again
-            if ($status === 'completed') {
+            // If completed or cancelled, make vehicle available again
+            if (in_array($status, ['completed', 'cancelled', 'no_show'])) {
                 $stmt = $pdo->prepare("UPDATE vehicles SET status = 'available' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
                 $stmt->execute([$booking_id]);
             }
             // If active, mark vehicle as rented
             if ($status === 'active') {
                 $stmt = $pdo->prepare("UPDATE vehicles SET status = 'rented' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+            // If confirmed, mark vehicle as reserved
+            if ($status === 'confirmed') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'reserved' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
                 $stmt->execute([$booking_id]);
             }
 
@@ -322,6 +327,8 @@ try {
                     <?php endif; ?>
                 </div>
             </div>
+            <!-- Extra spacer for mobile scrolling -->
+            <div class="h-32 lg:hidden"></div>
         </main>
     </div>
 </div>
