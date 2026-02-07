@@ -57,6 +57,18 @@ try {
         $pdo->exec("ALTER TABLE bookings ADD COLUMN pickup_longitude DECIMAL(11, 8) NULL AFTER pickup_latitude");
     }
 
+    // 6. Ensure balance_amount column exists in bookings table
+    $stmt = $pdo->query("SHOW COLUMNS FROM bookings LIKE 'balance_amount'");
+    if (!$stmt->fetch()) {
+        try {
+            $pdo->exec("ALTER TABLE bookings ADD COLUMN balance_amount DECIMAL(10, 2) GENERATED ALWAYS AS (total_amount - downpayment_amount) STORED AFTER downpayment_amount");
+        } catch (Exception $e) {
+            // Fallback for older MySQL versions that don't support generated columns
+            $pdo->exec("ALTER TABLE bookings ADD COLUMN balance_amount DECIMAL(10, 2) NULL AFTER downpayment_amount");
+            $pdo->exec("UPDATE bookings SET balance_amount = total_amount - downpayment_amount");
+        }
+    }
+
 } catch (Exception $e) {
     error_log("Migration failed: " . $e->getMessage());
 }

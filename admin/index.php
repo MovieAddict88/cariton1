@@ -262,6 +262,10 @@ try {
                                     </div>
                                     <div class="text-right">
                                         <p class="font-bold text-sm"><?= formatCurrency(convertCurrency($booking['total_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                        <div class="flex flex-col items-end gap-0.5 mt-1">
+                                            <p class="text-[9px] font-bold text-emerald-600">DP: <?= formatCurrency(convertCurrency($booking['downpayment_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                            <p class="text-[9px] font-bold text-orange-600">Bal: <?= formatCurrency(convertCurrency($booking['balance_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                        </div>
                                         <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase <?= 
                                             $booking['booking_status'] === 'completed' ? 'bg-green-100 text-green-700' : 
                                             ($booking['booking_status'] === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700')

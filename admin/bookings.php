@@ -80,6 +80,8 @@ try {
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Vehicle</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Dates</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Total</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Downpayment</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Balance</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Driver</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
@@ -108,6 +110,12 @@ try {
                                         <td class="px-6 py-4 font-bold">
                                             <?= formatCurrency(convertCurrency($b['total_amount'], 'PHP', $selected_currency), $selected_currency) ?>
                                         </td>
+                                        <td class="px-6 py-4 text-xs font-bold text-emerald-600">
+                                            <?= formatCurrency(convertCurrency($b['downpayment_amount'], 'PHP', $selected_currency), $selected_currency) ?>
+                                        </td>
+                                        <td class="px-6 py-4 text-xs font-bold text-orange-600">
+                                            <?= formatCurrency(convertCurrency($b['balance_amount'], 'PHP', $selected_currency), $selected_currency) ?>
+                                        </td>
                                         <td class="px-6 py-4">
                                             <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <?= 
                                                 $b['booking_status'] === 'completed' ? 'bg-green-100 text-green-700' : 
@@ -132,6 +140,10 @@ try {
                                             </form>
                                         </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                                            <a href="booking_details.php?id=<?= $b['id'] ?>"
+                                               class="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" title="View Details">
+                                                <span class="material-symbols-outlined text-lg">visibility</span>
+                                            </a>
                                             <?php if ($b['pickup_latitude'] && $b['pickup_longitude']): ?>
                                                 <button onclick="showPickupMap(<?= $b['pickup_latitude'] ?>, <?= $b['pickup_longitude'] ?>, '<?= addslashes(htmlspecialchars($b['pickup_location'])) ?>', '<?= addslashes(htmlspecialchars($b['pickup_description'])) ?>')"
                                                         class="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="View Pickup Location">
