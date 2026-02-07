@@ -15,10 +15,12 @@ if (!$booking_id) {
 $pdo = getDBConnection();
 $stmt = $pdo->prepare("
     SELECT b.*, v.make, v.model, v.images, v.plate_number, v.transmission, v.fuel_type, v.daily_rate,
-           p.status as payment_status, p.payment_method, p.transaction_reference, p.amount as payment_amount
+           p.status as payment_status, p.payment_method, p.transaction_reference, p.amount as payment_amount,
+           d.first_name as driver_first_name, d.last_name as driver_last_name, d.phone as driver_phone, d.employee_id as driver_employee_id, d.rating as driver_rating
     FROM bookings b
     LEFT JOIN vehicles v ON b.vehicle_id = v.id
     LEFT JOIN payments p ON b.id = p.booking_id
+    LEFT JOIN drivers d ON b.driver_id = d.id
     WHERE b.id = ? AND b.user_id = ?
 ");
 $stmt->execute([$booking_id, $_SESSION['user_id']]);
@@ -95,6 +97,34 @@ $vehicle_image = !empty($images) ? $images[0] : 'https://images.unsplash.com/pho
             <h2 class="text-2xl font-bold text-primary mb-1"><?= htmlspecialchars($booking['reference_number']) ?></h2>
             <p class="text-xs text-gray-500">Booked on <?= date('M d, Y h:i A', strtotime($booking['created_at'])) ?></p>
         </div>
+
+        <!-- Driver Details -->
+        <?php if ($booking['driver_id']): ?>
+        <div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-2xl">person</span>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Assigned Driver</p>
+                    <h3 class="text-lg font-bold"><?= htmlspecialchars($booking['driver_first_name'] . ' ' . $booking['driver_last_name']) ?></h3>
+                </div>
+                <div class="ml-auto flex flex-col items-end">
+                    <div class="flex items-center text-amber-500">
+                        <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">star</span>
+                        <span class="text-xs font-bold ml-0.5"><?= $booking['driver_rating'] ?: 'N/A' ?></span>
+                    </div>
+                    <p class="text-[10px] text-gray-500 font-bold"><?= htmlspecialchars($booking['driver_employee_id']) ?></p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <a href="tel:<?= htmlspecialchars($booking['driver_phone']) ?>" class="flex items-center gap-2 text-sm font-medium text-primary">
+                    <span class="material-symbols-outlined text-base">call</span>
+                    <?= htmlspecialchars($booking['driver_phone']) ?>
+                </a>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Vehicle Details -->
         <div class="bg-card-light dark:bg-card-dark rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm">

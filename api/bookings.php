@@ -34,10 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmt = $pdo->prepare("
                 SELECT b.*, v.make, v.model, v.images, v.vehicle_type, v.plate_number, v.daily_rate,
                        v.transmission, v.fuel_type, v.seats,
-                       p.status as payment_status, p.amount as payment_amount, p.payment_method, p.transaction_reference
+                       p.status as payment_status, p.amount as payment_amount, p.payment_method, p.transaction_reference,
+                       d.first_name as driver_first_name, d.last_name as driver_last_name, d.phone as driver_phone, d.employee_id as driver_employee_id
                 FROM bookings b
                 LEFT JOIN vehicles v ON b.vehicle_id = v.id
                 LEFT JOIN payments p ON b.id = p.booking_id
+                LEFT JOIN drivers d ON b.driver_id = d.id
                 WHERE b.id = ?
             ");
             $stmt->execute([$booking_id]);
@@ -143,6 +145,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Create new booking
         $user_id = $input['user_id'] ?? $_SESSION['user_id'] ?? null;
         $vehicle_id = $input['vehicle_id'] ?? null;
+        $driver_id = $input['driver_id'] ?? null;
         $pickup_date = $input['pickup_date'] ?? null;
         $dropoff_date = $input['dropoff_date'] ?? null;
         $pickup_location = $input['pickup_location'] ?? '';
@@ -182,16 +185,16 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $pdo->prepare("
             INSERT INTO bookings (
-                reference_number, user_id, vehicle_id, pickup_date, dropoff_date, 
+                reference_number, user_id, vehicle_id, driver_id, pickup_date, dropoff_date,
                 pickup_location, pickup_description, pickup_latitude, pickup_longitude,
                 dropoff_location, daily_rate,
                 insurance_amount, service_fee, total_amount, downpayment_amount,
                 booking_status, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
         ");
         
         $stmt->execute([
-            $reference_number, $user_id, $vehicle_id, $pickup_date, $dropoff_date,
+            $reference_number, $user_id, $vehicle_id, $driver_id, $pickup_date, $dropoff_date,
             $pickup_location, $pickup_description, $pickup_latitude, $pickup_longitude,
             $dropoff_location, $daily_rate,
             $insurance, $service_fee, $total_amount, $downpayment

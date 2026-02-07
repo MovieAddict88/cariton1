@@ -162,6 +162,26 @@
     </div>
 </div>
 
+<!-- Driver Selection -->
+<div class="px-4 pt-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Driver Service</h3>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="withDriver" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:bg-slate-700 rounded-full peer dark:peer-bg-slate-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+            <span class="ms-3 text-sm font-medium text-slate-700 dark:text-slate-300">With Driver</span>
+        </label>
+    </div>
+
+    <div id="driverSelectionArea" class="hidden space-y-4">
+        <p class="text-xs text-slate-500 dark:text-slate-400">Select your preferred driver from our list of active professionals.</p>
+        <div id="driversList" class="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-1">
+            <p class="text-center text-sm text-slate-500 py-4">Loading drivers...</p>
+        </div>
+        <input type="hidden" id="selectedDriverId" name="driver_id">
+    </div>
+</div>
+
 <!-- Pricing Breakdown -->
 <div class="px-4 pt-8">
 <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight pb-4">Payment Breakdown</h3>
@@ -293,11 +313,87 @@ function displayVehicle() {
 }
 
 function setupDateListeners() {
-    document.getElementById('pickupDate').addEventListener('change', calculateTotal);
-    document.getElementById('dropoffDate').addEventListener('change', calculateTotal);
+    document.getElementById('pickupDate').addEventListener('change', () => {
+        calculateTotal();
+        if (document.getElementById('withDriver').checked) {
+            loadDrivers();
+        }
+    });
+    document.getElementById('dropoffDate').addEventListener('change', () => {
+        calculateTotal();
+        if (document.getElementById('withDriver').checked) {
+            loadDrivers();
+        }
+    });
     
+    // Driver toggle listener
+    document.getElementById('withDriver').addEventListener('change', function() {
+        const area = document.getElementById('driverSelectionArea');
+        if (this.checked) {
+            area.classList.remove('hidden');
+            loadDrivers();
+        } else {
+            area.classList.add('hidden');
+            document.getElementById('selectedDriverId').value = '';
+            calculateTotal();
+        }
+    });
+
     // Calculate initial total
     calculateTotal();
+}
+
+async function loadDrivers() {
+    const pickupDate = document.getElementById('pickupDate').value;
+    const dropoffDate = document.getElementById('dropoffDate').value;
+    const listElement = document.getElementById('driversList');
+
+    // Reset selected driver when reloading the list
+    document.getElementById('selectedDriverId').value = '';
+
+    listElement.innerHTML = '<p class="text-center text-sm text-slate-500 py-4">Loading available drivers...</p>';
+
+    try {
+        const response = await fetch(`../api/drivers.php?pickup_date=${pickupDate}&dropoff_date=${dropoffDate}`);
+        const result = await response.json();
+
+        if (result.success && result.data.length > 0) {
+            listElement.innerHTML = '';
+            result.data.forEach(driver => {
+                const driverCard = document.createElement('div');
+                driverCard.className = 'driver-card flex items-center p-3 rounded-xl bg-white dark:bg-[#192633] border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-primary transition-all';
+                driverCard.dataset.id = driver.id;
+                driverCard.innerHTML = `
+                    <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">${driver.first_name} ${driver.last_name}</h4>
+                            <div class="flex items-center text-amber-500">
+                                <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">star</span>
+                                <span class="text-[10px] font-bold ml-0.5">${driver.rating || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 uppercase font-bold">${driver.experience_years} Years Exp • ${driver.employee_id}</p>
+                    </div>
+                `;
+
+                driverCard.addEventListener('click', function() {
+                    document.querySelectorAll('.driver-card').forEach(c => c.classList.remove('border-primary', 'bg-primary/5'));
+                    this.classList.add('border-primary', 'bg-primary/5');
+                    document.getElementById('selectedDriverId').value = this.dataset.id;
+                });
+
+                listElement.appendChild(driverCard);
+            });
+        } else {
+            listElement.innerHTML = '<p class="text-center text-sm text-slate-500 py-4">No drivers available for these dates.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading drivers:', error);
+        listElement.innerHTML = '<p class="text-center text-sm text-red-500 py-4">Failed to load drivers.</p>';
+    }
 }
 
 function initMap() {
@@ -371,9 +467,16 @@ document.getElementById('proceedButton').addEventListener('click', async functio
     const description = document.getElementById('pickupDescription').value;
     const lat = document.getElementById('pickupLat').value;
     const lng = document.getElementById('pickupLng').value;
+    const withDriver = document.getElementById('withDriver').checked;
+    const driverId = document.getElementById('selectedDriverId').value;
     
     if (!pickupDate || !dropoffDate || !location) {
         alert('Please fill in all fields');
+        return;
+    }
+
+    if (withDriver && !driverId) {
+        alert('Please select a driver or uncheck "With Driver"');
         return;
     }
     
@@ -397,6 +500,7 @@ document.getElementById('proceedButton').addEventListener('click', async functio
             body: JSON.stringify({
                 user_id: user.user_id,
                 vehicle_id: vehicleId,
+                driver_id: withDriver ? driverId : null,
                 pickup_date: pickupDate,
                 dropoff_date: dropoffDate,
                 pickup_location: location,
