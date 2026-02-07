@@ -19,11 +19,24 @@ try {
         $message = "Booking status updated to " . $_POST['status'];
     }
 
+    if (isset($_POST['update_driver'])) {
+        $driver_id = !empty($_POST['driver_id']) ? $_POST['driver_id'] : null;
+        $stmt = $pdo->prepare("UPDATE bookings SET driver_id = ? WHERE id = ?");
+        $stmt->execute([$driver_id, $_POST['booking_id']]);
+        $message = "Driver assignment updated!";
+    }
+
+    // Get all drivers for the dropdown (including inactive ones if they are currently assigned)
+    $stmt = $pdo->query("SELECT id, first_name, last_name, employee_id, status FROM drivers ORDER BY first_name ASC");
+    $all_drivers = $stmt->fetchAll();
+
     // Get bookings
-    $stmt = $pdo->query("SELECT b.*, u.first_name, u.last_name, v.make, v.model, v.plate_number 
+    $stmt = $pdo->query("SELECT b.*, u.first_name, u.last_name, v.make, v.model, v.plate_number,
+                         d.first_name as driver_first_name, d.last_name as driver_last_name
                          FROM bookings b 
                          LEFT JOIN users u ON b.user_id = u.id 
                          LEFT JOIN vehicles v ON b.vehicle_id = v.id 
+                         LEFT JOIN drivers d ON b.driver_id = d.id
                          ORDER BY b.created_at DESC");
     $bookings = $stmt->fetchAll();
 
@@ -68,6 +81,7 @@ try {
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Dates</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Total</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Driver</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
                             </tr>
                         </thead>
@@ -102,6 +116,20 @@ try {
                                             ?>">
                                                 <?= $b['booking_status'] ?>
                                             </span>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <form method="POST" class="inline">
+                                                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                                <input type="hidden" name="update_driver" value="1">
+                                                <select name="driver_id" onchange="this.form.submit()" class="text-[10px] font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900 focus:ring-primary w-full">
+                                                    <option value="">No Driver</option>
+                                                    <?php foreach ($all_drivers as $ad): ?>
+                                                        <option value="<?= $ad['id'] ?>" <?= $b['driver_id'] == $ad['id'] ? 'selected' : '' ?>>
+                                                            <?= htmlspecialchars($ad['first_name'] . ' ' . $ad['last_name']) ?> (<?= $ad['employee_id'] ?>) <?= $ad['status'] !== 'active' ? '['.strtoupper($ad['status']).']' : '' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </form>
                                         </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
                                             <?php if ($b['pickup_latitude'] && $b['pickup_longitude']): ?>
