@@ -44,8 +44,14 @@ try {
     $view = $_GET['view'] ?? 'active';
     $status_filter = $view === 'archived' ? "status = 'archived'" : "status != 'archived'";
 
-    // Get drivers
-    $stmt = $pdo->query("SELECT d.*, v.make, v.model FROM drivers d LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id WHERE d.$status_filter ORDER BY d.created_at DESC");
+    // Get drivers with both permanent and current booking assignments
+    $stmt = $pdo->query("SELECT d.*, v.make, v.model,
+                         (SELECT v2.make FROM bookings b2 JOIN vehicles v2 ON b2.vehicle_id = v2.id WHERE b2.driver_id = d.id AND b2.booking_status IN ('confirmed', 'active') LIMIT 1) as b_make,
+                         (SELECT v2.model FROM bookings b2 JOIN vehicles v2 ON b2.vehicle_id = v2.id WHERE b2.driver_id = d.id AND b2.booking_status IN ('confirmed', 'active') LIMIT 1) as b_model
+                         FROM drivers d
+                         LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id
+                         WHERE d.$status_filter
+                         ORDER BY d.created_at DESC");
     $drivers = $stmt->fetchAll();
 
 } catch (PDOException $e) {
@@ -114,7 +120,17 @@ try {
                                 </div>
                                 <div class="flex justify-between text-sm">
                                     <span class="text-slate-500">Assigned</span>
-                                    <span class="font-medium text-xs"><?= $d['make'] ? ($d['make'] . ' ' . $d['model']) : 'Unassigned' ?></span>
+                                    <span class="font-medium text-xs">
+                                        <?php
+                                        if ($d['make']) {
+                                            echo htmlspecialchars($d['make'] . ' ' . $d['model']);
+                                        } elseif ($d['b_make']) {
+                                            echo htmlspecialchars($d['b_make'] . ' ' . $d['b_model']) . ' <span class="text-[10px] text-primary opacity-70">(Booked)</span>';
+                                        } else {
+                                            echo 'Unassigned';
+                                        }
+                                        ?>
+                                    </span>
                                 </div>
                             </div>
                             <div class="flex gap-2">

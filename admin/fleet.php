@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            $imagesJson = json_encode($images);
+            $imagesJson = json_encode(array_values(array_unique(array_filter($images))));
             $stmt = $pdo->prepare("INSERT INTO vehicles (make, model, year, color, plate_number, vehicle_type, transmission, fuel_type, seats, daily_rate, status, images, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_POST['make'], $_POST['model'], $_POST['year'], $_POST['color'],
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            $imagesJson = json_encode($images);
+            $imagesJson = json_encode(array_values(array_unique(array_filter($images))));
             $stmt = $pdo->prepare("UPDATE vehicles SET make=?, model=?, year=?, color=?, plate_number=?, vehicle_type=?, transmission=?, fuel_type=?, seats=?, daily_rate=?, status=?, images=?, description=? WHERE id=?");
             $stmt->execute([
                 $_POST['make'], $_POST['model'], $_POST['year'], $_POST['color'],
@@ -401,11 +401,11 @@ function openEditModal(vehicle) {
     // Handle images
     let images = [];
     try {
-        images = JSON.parse(vehicle.images || '[]');
+        images = typeof vehicle.images === 'string' ? JSON.parse(vehicle.images || '[]') : (vehicle.images || []);
     } catch(e) {
         images = [];
     }
-    form.images.value = images.join(',');
+    form.image_urls.value = images.join(',');
     
     form.description.value = vehicle.description || '';
     
