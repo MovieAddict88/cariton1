@@ -57,6 +57,14 @@ try {
         $pdo->exec("ALTER TABLE bookings ADD COLUMN pickup_longitude DECIMAL(11, 8) NULL AFTER pickup_latitude");
     }
 
+    // Ensure dropoff location details exist in bookings table
+    $stmt = $pdo->query("SHOW COLUMNS FROM bookings LIKE 'dropoff_description'");
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN dropoff_description TEXT NULL AFTER dropoff_location");
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN dropoff_latitude DECIMAL(10, 8) NULL AFTER dropoff_description");
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN dropoff_longitude DECIMAL(11, 8) NULL AFTER dropoff_latitude");
+    }
+
     // 6. Ensure balance_amount column exists in bookings table
     $stmt = $pdo->query("SHOW COLUMNS FROM bookings LIKE 'balance_amount'");
     if (!$stmt->fetch()) {

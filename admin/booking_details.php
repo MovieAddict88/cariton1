@@ -7,6 +7,21 @@
 $page_title = 'Booking Details';
 require_once 'includes/header.php';
 
+?>
+<style>
+    :root {
+        --fluid-text-xs: clamp(0.6rem, 0.5rem + 0.5vw, 0.75rem);
+        --fluid-text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+        --fluid-text-base: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+        --fluid-text-lg: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+        --fluid-text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+        --fluid-padding: clamp(1rem, 0.8rem + 1vw, 2rem);
+    }
+    .fluid-p { padding: var(--fluid-padding); }
+    .text-fluid-xl { font-size: var(--fluid-text-xl); }
+</style>
+<?php
+
 $booking_id = $_GET['id'] ?? null;
 if (!$booking_id) {
     echo "<script>window.location.href='bookings.php';</script>";
@@ -59,7 +74,7 @@ try {
                 <a href="bookings.php" class="text-slate-900 dark:text-white flex size-10 items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                     <span class="material-symbols-outlined">arrow_back</span>
                 </a>
-                <h2 class="text-slate-900 dark:text-white text-lg font-bold">Booking Details: <?= $booking['reference_number'] ?></h2>
+                <h2 class="text-slate-900 dark:text-white text-fluid-lg font-bold">Booking Details: <?= $booking['reference_number'] ?></h2>
             </div>
             <div class="flex gap-2">
                 <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -69,7 +84,7 @@ try {
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 admin-content">
+        <main class="flex-1 overflow-y-auto fluid-p pb-24 admin-content">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 <!-- Left Column: Summary & Customer -->
@@ -80,7 +95,7 @@ try {
                         <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
                             <div>
                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Booking Reference</p>
-                                <h1 class="text-3xl font-bold text-primary"><?= $booking['reference_number'] ?></h1>
+                                <h1 class="text-fluid-xl font-bold text-primary"><?= $booking['reference_number'] ?></h1>
                                 <p class="text-xs text-slate-500 mt-1">Booked on <?= date('F j, Y \a\t g:i A', strtotime($booking['created_at'])) ?></p>
                             </div>
                             <div class="flex flex-col items-end gap-2">
@@ -121,45 +136,80 @@ try {
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <h3 class="font-bold text-sm mb-3 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-lg">location_on</span>
-                                Pickup Details
-                            </h3>
-                            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4">
-                                <p class="text-sm font-semibold mb-1"><?= htmlspecialchars($booking['pickup_location']) ?></p>
-                                <?php if ($booking['pickup_description']): ?>
-                                    <p class="text-xs text-slate-500 italic">"<?= htmlspecialchars($booking['pickup_description']) ?>"</p>
-                                <?php endif; ?>
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-sm mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">location_on</span>
+                                    Pickup Details
+                                </h3>
+                                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800/50">
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Pickup Address</p>
+                                    <p class="text-sm font-semibold mb-1"><?= htmlspecialchars($booking['pickup_location']) ?></p>
+                                    <?php if ($booking['pickup_description']): ?>
+                                        <p class="text-[11px] text-slate-500 italic mt-2">"<?= htmlspecialchars($booking['pickup_description']) ?>"</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm mb-3 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-rose-500 text-lg">keyboard_return</span>
+                                    Return Details
+                                </h3>
+                                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800/50">
+                                    <p class="text-xs font-bold text-slate-400 uppercase mb-1">Return Address</p>
+                                    <p class="text-sm font-semibold mb-1"><?= htmlspecialchars($booking['dropoff_location'] ?: 'Same as pickup') ?></p>
+                                    <?php if ($booking['dropoff_description']): ?>
+                                        <p class="text-[11px] text-slate-500 italic mt-2">"<?= htmlspecialchars($booking['dropoff_description']) ?>"</p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Map Card -->
-                    <?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
-                    <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
-                            <h3 class="font-bold text-lg flex items-center gap-2">
-                                Pickup Location Map
-                                <span class="text-[10px] text-emerald-500 flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 rounded-full">
-                                    <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    LIVE
-                                </span>
-                            </h3>
-                            <div class="flex gap-2">
-                                <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                                    <span class="material-symbols-outlined text-sm">map</span>
-                                    Google Maps
-                                </a>
-                                <a href="https://waze.com/ul?ll=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>&navigate=yes" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#33ccff]/10 text-[#33ccff] rounded-lg text-xs font-bold hover:bg-[#33ccff]/20 transition-colors">
-                                    <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3.5" alt="Waze">
-                                    Waze
-                                </a>
+                    <!-- Maps Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
+                        <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                                <h3 class="font-bold text-base flex items-center gap-2">
+                                    Pickup Map
+                                    <span class="text-[9px] text-emerald-500 flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 rounded-full">
+                                        <span class="size-1 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        LIVE
+                                    </span>
+                                </h3>
+                                <div class="flex gap-1">
+                                    <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>" target="_blank" class="size-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined text-base">map</span>
+                                    </a>
+                                    <a href="https://waze.com/ul?ll=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>&navigate=yes" target="_blank" class="size-8 flex items-center justify-center bg-[#33ccff]/10 text-[#33ccff] rounded-lg hover:bg-[#33ccff]/20 transition-colors">
+                                        <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3.5" alt="Waze">
+                                    </a>
+                                </div>
                             </div>
+                            <div id="detailsPickupMap" class="w-full h-64 rounded-xl border border-slate-100 dark:border-slate-800 z-0"></div>
                         </div>
-                        <div id="detailsPickupMap" class="w-full h-80 rounded-xl border border-slate-100 dark:border-slate-800 z-0"></div>
+                        <?php endif; ?>
+
+                        <?php if ($booking['dropoff_latitude'] && $booking['dropoff_longitude']): ?>
+                        <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                                <h3 class="font-bold text-base flex items-center gap-2">
+                                    Return Map
+                                </h3>
+                                <div class="flex gap-1">
+                                    <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $booking['dropoff_latitude'] ?>,<?= $booking['dropoff_longitude'] ?>" target="_blank" class="size-8 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 transition-colors">
+                                        <span class="material-symbols-outlined text-base">map</span>
+                                    </a>
+                                    <a href="https://waze.com/ul?ll=<?= $booking['dropoff_latitude'] ?>,<?= $booking['dropoff_longitude'] ?>&navigate=yes" target="_blank" class="size-8 flex items-center justify-center bg-[#33ccff]/10 text-[#33ccff] rounded-lg hover:bg-[#33ccff]/20 transition-colors">
+                                        <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3.5" alt="Waze">
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="detailsDropoffMap" class="w-full h-64 rounded-xl border border-slate-100 dark:border-slate-800 z-0"></div>
+                        </div>
+                        <?php endif; ?>
                     </div>
-                    <?php endif; ?>
 
                     <!-- Payment History -->
                     <div class="bg-white dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -323,31 +373,11 @@ try {
     </div>
 </div>
 
-<?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
+<?php if (($booking['pickup_latitude'] && $booking['pickup_longitude']) || ($booking['dropoff_latitude'] && $booking['dropoff_longitude'])): ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const lat = <?= $booking['pickup_latitude'] ?>;
-        const lng = <?= $booking['pickup_longitude'] ?>;
-        const address = "<?= addslashes(htmlspecialchars($booking['pickup_location'])) ?>";
-
-        // Use CartoDB Voyager tiles for a clean, navigation-ready look (Waze-like)
-        const map = L.map('detailsPickupMap', {
-            zoomControl: false,
-            dragging: !L.Browser.mobile,
-            tap: !L.Browser.mobile
-        }).setView([lat, lng], 16);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-        // Custom Car Marker with Pulse effect for "Live" feel
         const carIcon = L.divIcon({
             html: `
                 <div class="relative flex items-center justify-center">
@@ -362,20 +392,45 @@ try {
             iconAnchor: [16, 16]
         });
 
-        const marker = L.marker([lat, lng], { icon: carIcon }).addTo(map);
-        marker.bindPopup(`
+        // Pickup Map
+        <?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
+        const pLat = <?= $booking['pickup_latitude'] ?>;
+        const pLng = <?= $booking['pickup_longitude'] ?>;
+        const pAddress = "<?= addslashes(htmlspecialchars($booking['pickup_location'])) ?>";
+
+        const pMap = L.map('detailsPickupMap', { zoomControl: false }).setView([pLat, pLng], 16);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(pMap);
+        L.control.zoom({ position: 'bottomright' }).addTo(pMap);
+
+        const pMarker = L.marker([pLat, pLng], { icon: carIcon }).addTo(pMap);
+        pMarker.bindPopup(`
             <div class="p-1">
                 <p class="font-bold text-sm mb-1">Pickup Location</p>
-                <p class="text-[11px] text-slate-500 leading-tight">${address}</p>
-                <div class="flex gap-2 mt-3">
-                    <a href="waze://?ll=${lat},${lng}&navigate=yes" class="text-[10px] font-bold text-[#33ccff] uppercase">Open Waze</a>
-                    <a href="geo:${lat},${lng}?q=${lat},${lng}" class="text-[10px] font-bold text-primary uppercase">Maps</a>
-                </div>
+                <p class="text-[11px] text-slate-500 leading-tight">${pAddress}</p>
             </div>
         `).openPopup();
+        setTimeout(() => pMap.invalidateSize(), 500);
+        <?php endif; ?>
 
-        // Invalidate size after a short delay to ensure map renders correctly
-        setTimeout(() => map.invalidateSize(), 500);
+        // Dropoff Map
+        <?php if ($booking['dropoff_latitude'] && $booking['dropoff_longitude']): ?>
+        const dLat = <?= $booking['dropoff_latitude'] ?>;
+        const dLng = <?= $booking['dropoff_longitude'] ?>;
+        const dAddress = "<?= addslashes(htmlspecialchars($booking['dropoff_location'])) ?>";
+
+        const dMap = L.map('detailsDropoffMap', { zoomControl: false }).setView([dLat, dLng], 16);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO' }).addTo(dMap);
+        L.control.zoom({ position: 'bottomright' }).addTo(dMap);
+
+        const dMarker = L.marker([dLat, dLng], { icon: carIcon }).addTo(dMap);
+        dMarker.bindPopup(`
+            <div class="p-1">
+                <p class="font-bold text-sm mb-1">Return Location</p>
+                <p class="text-[11px] text-slate-500 leading-tight">${dAddress}</p>
+            </div>
+        `).openPopup();
+        setTimeout(() => dMap.invalidateSize(), 500);
+        <?php endif; ?>
     });
 </script>
 <?php endif; ?>
