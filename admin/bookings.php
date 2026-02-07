@@ -80,6 +80,8 @@ try {
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Vehicle</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Dates</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Total</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Downpayment</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Balance</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Driver</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
@@ -108,6 +110,12 @@ try {
                                         <td class="px-6 py-4 font-bold">
                                             <?= formatCurrency(convertCurrency($b['total_amount'], 'PHP', $selected_currency), $selected_currency) ?>
                                         </td>
+                                        <td class="px-6 py-4 text-xs font-bold text-emerald-600">
+                                            <?= formatCurrency(convertCurrency($b['downpayment_amount'], 'PHP', $selected_currency), $selected_currency) ?>
+                                        </td>
+                                        <td class="px-6 py-4 text-xs font-bold text-orange-600">
+                                            <?= formatCurrency(convertCurrency($b['balance_amount'], 'PHP', $selected_currency), $selected_currency) ?>
+                                        </td>
                                         <td class="px-6 py-4">
                                             <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <?= 
                                                 $b['booking_status'] === 'completed' ? 'bg-green-100 text-green-700' : 
@@ -118,20 +126,32 @@ try {
                                             </span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <form method="POST" class="inline">
-                                                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
-                                                <input type="hidden" name="update_driver" value="1">
-                                                <select name="driver_id" onchange="this.form.submit()" class="text-[10px] font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900 focus:ring-primary w-full">
-                                                    <option value="">No Driver</option>
-                                                    <?php foreach ($all_drivers as $ad): ?>
-                                                        <option value="<?= $ad['id'] ?>" <?= $b['driver_id'] == $ad['id'] ? 'selected' : '' ?>>
-                                                            <?= htmlspecialchars($ad['first_name'] . ' ' . $ad['last_name']) ?> (<?= $ad['employee_id'] ?>) <?= $ad['status'] !== 'active' ? '['.strtoupper($ad['status']).']' : '' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </form>
+                                            <div class="flex flex-col gap-1">
+                                                <form method="POST" class="inline">
+                                                    <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                                    <input type="hidden" name="update_driver" value="1">
+                                                    <select name="driver_id" onchange="this.form.submit()" class="text-[10px] font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900 focus:ring-primary w-full cursor-pointer">
+                                                        <option value="">Assign Driver</option>
+                                                        <?php foreach ($all_drivers as $ad): ?>
+                                                            <option value="<?= $ad['id'] ?>" <?= $b['driver_id'] == $ad['id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($ad['first_name'] . ' ' . $ad['last_name']) ?> (<?= $ad['employee_id'] ?>)
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </form>
+                                                <?php if ($b['driver_id']): ?>
+                                                    <div class="flex items-center gap-1 text-[9px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-2 py-0.5 rounded-full w-fit">
+                                                        <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1">license</span>
+                                                        <?= htmlspecialchars($b['driver_first_name'] . ' ' . $b['driver_last_name']) ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                                            <a href="booking_details.php?id=<?= $b['id'] ?>"
+                                               class="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" title="View Details">
+                                                <span class="material-symbols-outlined text-lg">visibility</span>
+                                            </a>
                                             <?php if ($b['pickup_latitude'] && $b['pickup_longitude']): ?>
                                                 <button onclick="showPickupMap(<?= $b['pickup_latitude'] ?>, <?= $b['pickup_longitude'] ?>, '<?= addslashes(htmlspecialchars($b['pickup_location'])) ?>', '<?= addslashes(htmlspecialchars($b['pickup_description'])) ?>')"
                                                         class="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="View Pickup Location">
@@ -173,6 +193,9 @@ try {
                 </button>
             </div>
             <div class="p-6">
+                <div class="flex justify-end gap-2 mb-4" id="modalNavButtons">
+                    <!-- Dynamic buttons will be added here -->
+                </div>
                 <div id="adminPickupMap" class="w-full h-80 rounded-xl border border-slate-200 dark:border-slate-800 mb-4 z-0"></div>
                 <div class="space-y-4">
                     <div>
@@ -198,17 +221,43 @@ try {
 <script>
 let adminMap, adminMarker;
 
+const carIcon = L.divIcon({
+    html: `
+        <div class="relative flex items-center justify-center">
+            <div class="absolute size-10 bg-primary/30 rounded-full animate-ping"></div>
+            <div class="size-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1">directions_car</span>
+            </div>
+        </div>
+    `,
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16]
+});
+
 function showPickupMap(lat, lng, address, description) {
     document.getElementById('pickupModal').classList.remove('hidden');
     document.getElementById('modalAddress').textContent = address;
     document.getElementById('modalDescription').textContent = description || 'No description provided.';
 
+    // Add Nav Buttons
+    const navButtons = document.getElementById('modalNavButtons');
+    navButtons.innerHTML = `
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" class="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold">
+            <span class="material-symbols-outlined text-xs">map</span> Google Maps
+        </a>
+        <a href="https://waze.com/ul?ll=${lat},${lng}&navigate=yes" target="_blank" class="flex items-center gap-1 px-2 py-1 bg-[#33ccff]/10 text-[#33ccff] rounded text-[10px] font-bold">
+            <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3" alt="Waze"> Waze
+        </a>
+    `;
+
     setTimeout(() => {
         if (!adminMap) {
-            adminMap = L.map('adminPickupMap').setView([lat, lng], 16);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+            adminMap = L.map('adminPickupMap', { zoomControl: false }).setView([lat, lng], 16);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CARTO'
             }).addTo(adminMap);
+            L.control.zoom({ position: 'bottomright' }).addTo(adminMap);
         } else {
             // Remove all existing markers
             adminMap.eachLayer((layer) => {
@@ -217,7 +266,7 @@ function showPickupMap(lat, lng, address, description) {
             adminMap.setView([lat, lng], 16);
         }
 
-        adminMarker = L.marker([lat, lng]).addTo(adminMap);
+        adminMarker = L.marker([lat, lng], { icon: carIcon }).addTo(adminMap);
         adminMap.invalidateSize();
     }, 100);
 }
