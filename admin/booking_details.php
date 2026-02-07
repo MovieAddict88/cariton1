@@ -18,6 +18,10 @@ require_once 'includes/header.php';
         --fluid-padding: clamp(1rem, 0.8rem + 1vw, 2rem);
     }
     .fluid-p { padding: var(--fluid-padding); }
+    .text-fluid-xs { font-size: var(--fluid-text-xs); }
+    .text-fluid-sm { font-size: var(--fluid-text-sm); }
+    .text-fluid-base { font-size: var(--fluid-text-base); }
+    .text-fluid-lg { font-size: var(--fluid-text-lg); }
     .text-fluid-xl { font-size: var(--fluid-text-xl); }
 </style>
 <?php
@@ -52,6 +56,57 @@ try {
         exit;
     }
 
+    $message = '';
+    $error = '';
+
+    // Handle status updates
+    if (isset($_POST['update_status'])) {
+        $new_status = $_POST['status'];
+        $pdo->beginTransaction();
+        try {
+            $stmt = $pdo->prepare("UPDATE bookings SET booking_status = ? WHERE id = ?");
+            $stmt->execute([$new_status, $booking_id]);
+
+            // If completed or cancelled, make vehicle available again
+            if (in_array($new_status, ['completed', 'cancelled', 'no_show'])) {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'available' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+            // If active, mark vehicle as rented
+            if ($new_status === 'active') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'rented' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+            // If confirmed, mark vehicle as reserved
+            if ($new_status === 'confirmed') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'reserved' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+
+            $pdo->commit();
+            $message = "Booking status updated to " . ucfirst($new_status);
+
+            // Refresh booking data
+            $stmt = $pdo->prepare("
+                SELECT b.*,
+                       u.first_name as user_first_name, u.last_name as user_last_name, u.email as user_email, u.phone as user_phone, u.address as user_address,
+                       v.make, v.model, v.plate_number, v.images, v.transmission, v.fuel_type, v.daily_rate as vehicle_daily_rate,
+                       d.first_name as driver_first_name, d.last_name as driver_last_name, d.phone as driver_phone, d.employee_id as driver_employee_id, d.status as driver_status
+                FROM bookings b
+                LEFT JOIN users u ON b.user_id = u.id
+                LEFT JOIN vehicles v ON b.vehicle_id = v.id
+                LEFT JOIN drivers d ON b.driver_id = d.id
+                WHERE b.id = ?
+            ");
+            $stmt->execute([$booking_id]);
+            $booking = $stmt->fetch();
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $error = "Error updating status: " . $e->getMessage();
+        }
+    }
+
     // Fetch payment history for this booking
     $stmt = $pdo->prepare("SELECT * FROM payments WHERE booking_id = ? ORDER BY created_at DESC");
     $stmt->execute([$booking_id]);
@@ -68,8 +123,8 @@ try {
 <div class="flex h-screen overflow-hidden">
     <?php include 'includes/sidebar.php'; ?>
 
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="sticky top-0 z-30 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-slate-200 dark:border-slate-800 lg:px-8">
+    <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <header class="flex-none z-30 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 justify-between border-b border-slate-200 dark:border-slate-800 lg:px-8">
             <div class="flex items-center gap-4">
                 <a href="bookings.php" class="text-slate-900 dark:text-white flex size-10 items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                     <span class="material-symbols-outlined">arrow_back</span>
@@ -84,7 +139,19 @@ try {
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto fluid-p pb-24 admin-content">
+        <main class="flex-1 overflow-y-auto fluid-p admin-content" style="padding-bottom: 16rem !important;">
+            <?php if ($message): ?>
+                <div class="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6">
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error): ?>
+                <div class="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl mb-6">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 <!-- Left Column: Summary & Customer -->
@@ -336,6 +403,26 @@ try {
                         <?php endif; ?>
                     </div>
 
+                    <!-- Action Center -->
+                    <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <h3 class="font-bold text-sm uppercase text-slate-400 mb-4">Action Center</h3>
+                        <form method="POST" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Update Booking Status</label>
+                                <select name="status" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus:ring-primary text-sm font-bold">
+                                    <option value="pending" <?= $booking['booking_status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                                    <option value="confirmed" <?= $booking['booking_status'] === 'confirmed' ? 'selected' : '' ?>>Confirmed</option>
+                                    <option value="active" <?= $booking['booking_status'] === 'active' ? 'selected' : '' ?>>Active (On-going)</option>
+                                    <option value="completed" <?= $booking['booking_status'] === 'completed' ? 'selected' : '' ?>>Completed</option>
+                                    <option value="cancelled" <?= $booking['booking_status'] === 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
+                                </select>
+                            </div>
+                            <button type="submit" name="update_status" class="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
+                                Update Status
+                            </button>
+                        </form>
+                    </div>
+
                     <!-- Billing Summary -->
                     <div class="bg-primary text-white rounded-2xl p-6 shadow-lg shadow-primary/20">
                         <h3 class="font-bold text-sm uppercase text-white/60 mb-4">Financial Summary</h3>
@@ -369,6 +456,8 @@ try {
 
                 </div>
             </div>
+            <!-- Extra spacer for mobile scrolling -->
+            <div class="h-32 lg:hidden"></div>
         </main>
     </div>
 </div>
