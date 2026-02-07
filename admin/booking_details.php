@@ -138,13 +138,25 @@ try {
                     <!-- Map Card -->
                     <?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
                     <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <h3 class="font-bold text-lg mb-4 flex items-center justify-between">
-                            Pickup Location Map
-                            <span class="text-[10px] text-emerald-500 flex items-center gap-1">
-                                <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                Real-time Live Map
-                            </span>
-                        </h3>
+                        <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                            <h3 class="font-bold text-lg flex items-center gap-2">
+                                Pickup Location Map
+                                <span class="text-[10px] text-emerald-500 flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 rounded-full">
+                                    <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    LIVE
+                                </span>
+                            </h3>
+                            <div class="flex gap-2">
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">map</span>
+                                    Google Maps
+                                </a>
+                                <a href="https://waze.com/ul?ll=<?= $booking['pickup_latitude'] ?>,<?= $booking['pickup_longitude'] ?>&navigate=yes" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#33ccff]/10 text-[#33ccff] rounded-lg text-xs font-bold hover:bg-[#33ccff]/20 transition-colors">
+                                    <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3.5" alt="Waze">
+                                    Waze
+                                </a>
+                            </div>
+                        </div>
                         <div id="detailsPickupMap" class="w-full h-80 rounded-xl border border-slate-100 dark:border-slate-800 z-0"></div>
                     </div>
                     <?php endif; ?>
@@ -320,13 +332,47 @@ try {
         const lng = <?= $booking['pickup_longitude'] ?>;
         const address = "<?= addslashes(htmlspecialchars($booking['pickup_location'])) ?>";
 
-        const map = L.map('detailsPickupMap').setView([lat, lng], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Use CartoDB Voyager tiles for a clean, navigation-ready look (Waze-like)
+        const map = L.map('detailsPickupMap', {
+            zoomControl: false,
+            dragging: !L.Browser.mobile,
+            tap: !L.Browser.mobile
+        }).setView([lat, lng], 16);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
 
-        const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>Pickup Location</b><br>${address}`).openPopup();
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Custom Car Marker with Pulse effect for "Live" feel
+        const carIcon = L.divIcon({
+            html: `
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute size-10 bg-primary/30 rounded-full animate-ping"></div>
+                    <div class="size-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1">directions_car</span>
+                    </div>
+                </div>
+            `,
+            className: '',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker([lat, lng], { icon: carIcon }).addTo(map);
+        marker.bindPopup(`
+            <div class="p-1">
+                <p class="font-bold text-sm mb-1">Pickup Location</p>
+                <p class="text-[11px] text-slate-500 leading-tight">${address}</p>
+                <div class="flex gap-2 mt-3">
+                    <a href="waze://?ll=${lat},${lng}&navigate=yes" class="text-[10px] font-bold text-[#33ccff] uppercase">Open Waze</a>
+                    <a href="geo:${lat},${lng}?q=${lat},${lng}" class="text-[10px] font-bold text-primary uppercase">Maps</a>
+                </div>
+            </div>
+        `).openPopup();
 
         // Invalidate size after a short delay to ensure map renders correctly
         setTimeout(() => map.invalidateSize(), 500);

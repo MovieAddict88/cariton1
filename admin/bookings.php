@@ -185,6 +185,9 @@ try {
                 </button>
             </div>
             <div class="p-6">
+                <div class="flex justify-end gap-2 mb-4" id="modalNavButtons">
+                    <!-- Dynamic buttons will be added here -->
+                </div>
                 <div id="adminPickupMap" class="w-full h-80 rounded-xl border border-slate-200 dark:border-slate-800 mb-4 z-0"></div>
                 <div class="space-y-4">
                     <div>
@@ -210,17 +213,43 @@ try {
 <script>
 let adminMap, adminMarker;
 
+const carIcon = L.divIcon({
+    html: `
+        <div class="relative flex items-center justify-center">
+            <div class="absolute size-10 bg-primary/30 rounded-full animate-ping"></div>
+            <div class="size-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1">directions_car</span>
+            </div>
+        </div>
+    `,
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16]
+});
+
 function showPickupMap(lat, lng, address, description) {
     document.getElementById('pickupModal').classList.remove('hidden');
     document.getElementById('modalAddress').textContent = address;
     document.getElementById('modalDescription').textContent = description || 'No description provided.';
 
+    // Add Nav Buttons
+    const navButtons = document.getElementById('modalNavButtons');
+    navButtons.innerHTML = `
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank" class="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold">
+            <span class="material-symbols-outlined text-xs">map</span> Google Maps
+        </a>
+        <a href="https://waze.com/ul?ll=${lat},${lng}&navigate=yes" target="_blank" class="flex items-center gap-1 px-2 py-1 bg-[#33ccff]/10 text-[#33ccff] rounded text-[10px] font-bold">
+            <img src="https://www.vectorlogo.zone/logos/waze/waze-icon.svg" class="size-3" alt="Waze"> Waze
+        </a>
+    `;
+
     setTimeout(() => {
         if (!adminMap) {
-            adminMap = L.map('adminPickupMap').setView([lat, lng], 16);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+            adminMap = L.map('adminPickupMap', { zoomControl: false }).setView([lat, lng], 16);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap © CARTO'
             }).addTo(adminMap);
+            L.control.zoom({ position: 'bottomright' }).addTo(adminMap);
         } else {
             // Remove all existing markers
             adminMap.eachLayer((layer) => {
@@ -229,7 +258,7 @@ function showPickupMap(lat, lng, address, description) {
             adminMap.setView([lat, lng], 16);
         }
 
-        adminMarker = L.marker([lat, lng]).addTo(adminMap);
+        adminMarker = L.marker([lat, lng], { icon: carIcon }).addTo(adminMap);
         adminMap.invalidateSize();
     }, 100);
 }
