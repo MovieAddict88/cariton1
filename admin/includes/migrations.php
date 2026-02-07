@@ -43,6 +43,14 @@ try {
         $pdo->exec("UPDATE vehicles SET is_featured = 1 LIMIT 3");
     }
 
+    // 5. Ensure pickup location details exist in bookings table
+    $stmt = $pdo->query("SHOW COLUMNS FROM bookings LIKE 'pickup_description'");
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN pickup_description TEXT NULL AFTER pickup_location");
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN pickup_latitude DECIMAL(10, 8) NULL AFTER pickup_description");
+        $pdo->exec("ALTER TABLE bookings ADD COLUMN pickup_longitude DECIMAL(11, 8) NULL AFTER pickup_latitude");
+    }
+
 } catch (Exception $e) {
     error_log("Migration failed: " . $e->getMessage());
 }

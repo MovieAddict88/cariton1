@@ -60,6 +60,8 @@ $vehicle_image = !empty($images) ? $images[0] : 'https://images.unsplash.com/pho
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen pb-24">
     <header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
@@ -106,6 +108,9 @@ $vehicle_image = !empty($images) ? $images[0] : 'https://images.unsplash.com/pho
                         <p class="text-[10px] text-gray-500 uppercase font-bold">Pickup</p>
                         <p class="text-sm font-semibold"><?= date('M d, Y', strtotime($booking['pickup_date'])) ?></p>
                         <p class="text-xs text-gray-500"><?= htmlspecialchars($booking['pickup_location']) ?></p>
+                        <?php if ($booking['pickup_description']): ?>
+                            <p class="text-[10px] mt-1 text-primary italic">"<?= htmlspecialchars($booking['pickup_description']) ?>"</p>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <p class="text-[10px] text-gray-500 uppercase font-bold">Dropoff</p>
@@ -115,6 +120,27 @@ $vehicle_image = !empty($images) ? $images[0] : 'https://images.unsplash.com/pho
                 </div>
             </div>
         </div>
+
+        <!-- Pickup Map -->
+        <?php if ($booking['pickup_latitude'] && $booking['pickup_longitude']): ?>
+        <div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm">
+            <h3 class="text-lg font-bold mb-4">Pickup Location Map</h3>
+            <div id="pickupMap" class="w-full h-64 rounded-xl border border-gray-100 dark:border-gray-800 z-0"></div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const lat = <?= $booking['pickup_latitude'] ?>;
+                    const lng = <?= $booking['pickup_longitude'] ?>;
+                    const map = L.map('pickupMap').setView([lat, lng], 16);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup('Pickup Location')
+                        .openPopup();
+                });
+            </script>
+        </div>
+        <?php endif; ?>
 
         <!-- Payment Summary -->
         <div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm">

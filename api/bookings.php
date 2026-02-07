@@ -146,6 +146,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pickup_date = $input['pickup_date'] ?? null;
         $dropoff_date = $input['dropoff_date'] ?? null;
         $pickup_location = $input['pickup_location'] ?? '';
+        $pickup_description = $input['pickup_description'] ?? '';
+        $pickup_latitude = $input['pickup_latitude'] ?? null;
+        $pickup_longitude = $input['pickup_longitude'] ?? null;
         $dropoff_location = $input['dropoff_location'] ?? '';
         
         if (!$user_id || !$vehicle_id || !$pickup_date || !$dropoff_date) {
@@ -180,15 +183,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             INSERT INTO bookings (
                 reference_number, user_id, vehicle_id, pickup_date, dropoff_date, 
-                pickup_location, dropoff_location, daily_rate, 
+                pickup_location, pickup_description, pickup_latitude, pickup_longitude,
+                dropoff_location, daily_rate,
                 insurance_amount, service_fee, total_amount, downpayment_amount,
                 booking_status, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
         ");
         
         $stmt->execute([
             $reference_number, $user_id, $vehicle_id, $pickup_date, $dropoff_date,
-            $pickup_location, $dropoff_location, $daily_rate,
+            $pickup_location, $pickup_description, $pickup_latitude, $pickup_longitude,
+            $dropoff_location, $daily_rate,
             $insurance, $service_fee, $total_amount, $downpayment
         ]);
         
