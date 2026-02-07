@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -140,10 +142,24 @@
 
 <!-- Location Selection -->
 <div class="px-4 pt-6">
-<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight pb-4">Pickup & Return Location</h3>
-<div class="flex flex-col gap-1">
-    <input id="location" type="text" class="w-full rounded-lg border border-slate-300 dark:border-[#324d67] bg-white dark:bg-[#192633] py-3 px-4 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="San Francisco Int'l Airport (SFO)" value="San Francisco Int'l Airport (SFO)" required/>
-</div>
+    <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight pb-4">Pickup Location</h3>
+    <div class="flex flex-col gap-4">
+        <div>
+            <label class="text-slate-700 dark:text-white text-sm font-medium px-1 mb-1 block">Full Address</label>
+            <input id="location" type="text" class="w-full rounded-lg border border-slate-300 dark:border-[#324d67] bg-white dark:bg-[#192633] py-3 px-4 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Enter complete address" required/>
+        </div>
+        <div>
+            <label class="text-slate-700 dark:text-white text-sm font-medium px-1 mb-1 block">Area Description</label>
+            <textarea id="pickupDescription" rows="2" class="w-full rounded-lg border border-slate-300 dark:border-[#324d67] bg-white dark:bg-[#192633] py-3 px-4 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Describe the area (e.g., near the blue gate, beside the church)"></textarea>
+        </div>
+        <div>
+            <label class="text-slate-700 dark:text-white text-sm font-medium px-1 mb-1 block">Pin Exact Location</label>
+            <div id="pickupMap" class="w-full h-64 rounded-xl border border-slate-300 dark:border-[#324d67] z-0"></div>
+            <p class="text-[10px] text-slate-500 mt-1">Drag the marker to your exact pickup spot.</p>
+        </div>
+        <input type="hidden" id="pickupLat">
+        <input type="hidden" id="pickupLng">
+    </div>
 </div>
 
 <!-- Pricing Breakdown -->
@@ -200,6 +216,7 @@
 <script>
 let vehicleData = null;
 let bookingData = null;
+let map, marker;
 
 // Get vehicle ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -235,8 +252,10 @@ async function loadVehicle() {
             
             displayVehicle();
             setupDateListeners();
+            initMap();
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
+            setTimeout(() => map.invalidateSize(), 100);
         }
     } catch (error) {
         console.error('Error loading vehicle:', error);
@@ -281,6 +300,44 @@ function setupDateListeners() {
     calculateTotal();
 }
 
+function initMap() {
+    // Default to Manila
+    const defaultLat = 14.5995;
+    const defaultLng = 120.9842;
+
+    map = L.map('pickupMap').setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    marker = L.marker([defaultLat, defaultLng], {
+        draggable: true
+    }).addTo(map);
+
+    // Update hidden inputs
+    document.getElementById('pickupLat').value = defaultLat;
+    document.getElementById('pickupLng').value = defaultLng;
+
+    marker.on('dragend', function(event) {
+        const position = marker.getLatLng();
+        document.getElementById('pickupLat').value = position.lat;
+        document.getElementById('pickupLng').value = position.lng;
+    });
+
+    // Try to get user current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map.setView([lat, lng], 15);
+            marker.setLatLng([lat, lng]);
+            document.getElementById('pickupLat').value = lat;
+            document.getElementById('pickupLng').value = lng;
+        });
+    }
+}
+
 function calculateTotal() {
     const pickupDate = new Date(document.getElementById('pickupDate').value);
     const dropoffDate = new Date(document.getElementById('dropoffDate').value);
@@ -311,6 +368,9 @@ document.getElementById('proceedButton').addEventListener('click', async functio
     const pickupDate = document.getElementById('pickupDate').value;
     const dropoffDate = document.getElementById('dropoffDate').value;
     const location = document.getElementById('location').value;
+    const description = document.getElementById('pickupDescription').value;
+    const lat = document.getElementById('pickupLat').value;
+    const lng = document.getElementById('pickupLng').value;
     
     if (!pickupDate || !dropoffDate || !location) {
         alert('Please fill in all fields');
@@ -340,6 +400,9 @@ document.getElementById('proceedButton').addEventListener('click', async functio
                 pickup_date: pickupDate,
                 dropoff_date: dropoffDate,
                 pickup_location: location,
+                pickup_description: description,
+                pickup_latitude: lat,
+                pickup_longitude: lng,
                 dropoff_location: location
             })
         });

@@ -44,6 +44,10 @@ try {
                 </button>
                 <h2 class="text-slate-900 dark:text-white text-lg font-bold">Bookings Management</h2>
             </div>
+            <button onclick="showAllPickups()" class="hidden lg:flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl font-bold text-sm shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-sm">map</span>
+                View All Pickups
+            </button>
         </header>
 
         <main class="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 admin-content">
@@ -99,7 +103,13 @@ try {
                                                 <?= $b['booking_status'] ?>
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 text-right">
+                                        <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                                            <?php if ($b['pickup_latitude'] && $b['pickup_longitude']): ?>
+                                                <button onclick="showPickupMap(<?= $b['pickup_latitude'] ?>, <?= $b['pickup_longitude'] ?>, '<?= addslashes(htmlspecialchars($b['pickup_location'])) ?>', '<?= addslashes(htmlspecialchars($b['pickup_description'])) ?>')"
+                                                        class="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors" title="View Pickup Location">
+                                                    <span class="material-symbols-outlined text-lg">location_on</span>
+                                                </button>
+                                            <?php endif; ?>
                                             <form method="POST" class="inline">
                                                 <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
                                                 <input type="hidden" name="update_status" value="1">
@@ -122,5 +132,126 @@ try {
         </main>
     </div>
 </div>
+
+<!-- Pickup Location Modal -->
+<div id="pickupModal" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closePickupModal()"></div>
+        <div class="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-surface-dark shadow-2xl border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4">
+                <h3 class="text-lg font-bold">Pickup Location</h3>
+                <button onclick="closePickupModal()" class="flex size-8 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="adminPickupMap" class="w-full h-80 rounded-xl border border-slate-200 dark:border-slate-800 mb-4 z-0"></div>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Address</p>
+                        <p id="modalAddress" class="text-sm font-semibold"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase">Area Description</p>
+                        <p id="modalDescription" class="text-sm text-slate-600 dark:text-slate-400 italic"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end p-4 border-t border-slate-100 dark:border-slate-800">
+                <button onclick="closePickupModal()" class="px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg font-bold text-sm">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+let adminMap, adminMarker;
+
+function showPickupMap(lat, lng, address, description) {
+    document.getElementById('pickupModal').classList.remove('hidden');
+    document.getElementById('modalAddress').textContent = address;
+    document.getElementById('modalDescription').textContent = description || 'No description provided.';
+
+    setTimeout(() => {
+        if (!adminMap) {
+            adminMap = L.map('adminPickupMap').setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(adminMap);
+        } else {
+            // Remove all existing markers
+            adminMap.eachLayer((layer) => {
+                if (layer instanceof L.Marker) adminMap.removeLayer(layer);
+            });
+            adminMap.setView([lat, lng], 16);
+        }
+
+        adminMarker = L.marker([lat, lng]).addTo(adminMap);
+        adminMap.invalidateSize();
+    }, 100);
+}
+
+function closePickupModal() {
+    document.getElementById('pickupModal').classList.add('hidden');
+}
+
+function showAllPickups() {
+    document.getElementById('pickupModal').classList.remove('hidden');
+    document.getElementById('modalAddress').textContent = "Multiple Locations";
+    document.getElementById('modalDescription').textContent = "Displaying all active and pending pickups.";
+
+    // Prepare data for markers
+    const pickupData = [
+        <?php foreach ($bookings as $b): ?>
+            <?php if ($b['pickup_latitude'] && $b['pickup_longitude'] && in_array($b['booking_status'], ['pending', 'confirmed', 'active'])): ?>
+                {
+                    lat: <?= $b['pickup_latitude'] ?>,
+                    lng: <?= $b['pickup_longitude'] ?>,
+                    ref: '<?= $b['reference_number'] ?>',
+                    customer: '<?= addslashes(htmlspecialchars($b['first_name'] . " " . $b['last_name'])) ?>',
+                    vehicle: '<?= addslashes(htmlspecialchars($b['make'] . " " . $b['model'])) ?>',
+                    location: '<?= addslashes(htmlspecialchars($b['pickup_location'])) ?>'
+                },
+            <?php endif; ?>
+        <?php endforeach; ?>
+    ];
+
+    setTimeout(() => {
+        if (!adminMap) {
+            adminMap = L.map('adminPickupMap').setView([14.5995, 120.9842], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(adminMap);
+        } else {
+            // Remove existing markers if any
+            adminMap.eachLayer((layer) => {
+                if (layer instanceof L.Marker) adminMap.removeLayer(layer);
+            });
+        }
+
+        const bounds = [];
+        pickupData.forEach(p => {
+            const marker = L.marker([p.lat, p.lng]).addTo(adminMap);
+            marker.bindPopup(`
+                <div class="p-1 min-w-[150px]">
+                    <p class="font-bold text-primary mb-1">${p.ref}</p>
+                    <p class="text-[11px] leading-relaxed"><b>Customer:</b> ${p.customer}</p>
+                    <p class="text-[11px] leading-relaxed"><b>Vehicle:</b> ${p.vehicle}</p>
+                    <p class="text-[10px] text-slate-500 mt-2 pt-2 border-t border-slate-100">${p.location}</p>
+                </div>
+            `);
+            bounds.push([p.lat, p.lng]);
+        });
+
+        if (bounds.length > 0) {
+            adminMap.fitBounds(bounds, { padding: [20, 20] });
+        }
+        adminMap.invalidateSize();
+    }, 100);
+}
+</script>
 
 <?php include 'includes/footer.php'; ?>
