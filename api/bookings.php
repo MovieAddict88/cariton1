@@ -153,6 +153,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pickup_latitude = $input['pickup_latitude'] ?? null;
         $pickup_longitude = $input['pickup_longitude'] ?? null;
         $dropoff_location = $input['dropoff_location'] ?? '';
+        $dropoff_description = $input['dropoff_description'] ?? '';
+        $dropoff_latitude = $input['dropoff_latitude'] ?? null;
+        $dropoff_longitude = $input['dropoff_longitude'] ?? null;
         
         if (!$user_id || !$vehicle_id || !$pickup_date || !$dropoff_date) {
             http_response_code(400);
@@ -187,17 +190,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             INSERT INTO bookings (
                 reference_number, user_id, vehicle_id, driver_id, pickup_date, dropoff_date,
                 pickup_location, pickup_description, pickup_latitude, pickup_longitude,
-                dropoff_location, daily_rate,
-                insurance_amount, service_fee, total_amount, downpayment_amount,
+                dropoff_location, dropoff_description, dropoff_latitude, dropoff_longitude,
+                daily_rate, insurance_amount, service_fee, total_amount, downpayment_amount,
                 booking_status, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
         ");
         
         $stmt->execute([
             $reference_number, $user_id, $vehicle_id, $driver_id, $pickup_date, $dropoff_date,
             $pickup_location, $pickup_description, $pickup_latitude, $pickup_longitude,
-            $dropoff_location, $daily_rate,
-            $insurance, $service_fee, $total_amount, $downpayment
+            $dropoff_location, $dropoff_description, $dropoff_latitude, $dropoff_longitude,
+            $daily_rate, $insurance, $service_fee, $total_amount, $downpayment
         ]);
         
         $booking_id = $pdo->lastInsertId();
