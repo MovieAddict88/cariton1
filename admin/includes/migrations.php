@@ -24,6 +24,12 @@ try {
         $pdo->exec("UPDATE drivers SET hire_date = CURDATE() WHERE hire_date IS NULL");
     }
 
+    // Ensure 'email' column exists in drivers table
+    $stmt = $pdo->query("SHOW COLUMNS FROM drivers LIKE 'email'");
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE drivers ADD COLUMN email VARCHAR(255) UNIQUE NULL AFTER last_name");
+    }
+
     // 3. Ensure favorites table exists
     $pdo->exec("CREATE TABLE IF NOT EXISTS favorites (
         id INT AUTO_INCREMENT PRIMARY KEY,

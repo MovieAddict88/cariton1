@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS drivers (
     user_id INT,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     employee_id VARCHAR(50) UNIQUE NOT NULL,
     license_number VARCHAR(50) NOT NULL,
     license_expiry DATE NOT NULL,
