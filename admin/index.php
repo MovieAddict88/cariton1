@@ -65,7 +65,7 @@ try {
                          FROM bookings b 
                          LEFT JOIN users u ON b.user_id = u.id 
                          LEFT JOIN vehicles v ON b.vehicle_id = v.id 
-                         ORDER BY b.created_at DESC LIMIT 5");
+                         ORDER BY b.created_at DESC LIMIT 10");
     $recent_bookings = $stmt->fetchAll();
     
     // Recent payments (Pending only)
@@ -250,28 +250,36 @@ try {
                             <div class="p-8 text-center text-slate-500">No recent bookings found.</div>
                         <?php else: ?>
                             <?php foreach ($recent_bookings as $booking): ?>
-                                <div class="px-6 py-4 flex items-center justify-between">
+                                <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
                                     <div class="flex items-center gap-4">
                                         <div class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                             <span class="material-symbols-outlined text-slate-400">confirmation_number</span>
                                         </div>
                                         <div>
-                                            <p class="font-medium text-sm"><?= htmlspecialchars($booking['first_name'] . ' ' . $booking['last_name']) ?></p>
-                                            <p class="text-xs text-slate-500"><?= htmlspecialchars($booking['make'] . ' ' . $booking['model']) ?></p>
+                                            <p class="font-bold text-sm"><?= htmlspecialchars($booking['first_name'] . ' ' . $booking['last_name']) ?></p>
+                                            <p class="text-[10px] text-slate-500"><?= htmlspecialchars($booking['make'] . ' ' . $booking['model']) ?> • <?= $booking['reference_number'] ?></p>
                                         </div>
                                     </div>
-                                    <div class="text-right">
-                                        <p class="font-bold text-sm"><?= formatCurrency(convertCurrency($booking['total_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
-                                        <div class="flex flex-col items-end gap-0.5 mt-1">
-                                            <p class="text-[9px] font-bold text-emerald-600">DP: <?= formatCurrency(convertCurrency($booking['downpayment_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
-                                            <p class="text-[9px] font-bold text-orange-600">Bal: <?= formatCurrency(convertCurrency($booking['balance_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                    <div class="flex items-center gap-4">
+                                        <div class="text-right hidden sm:block">
+                                            <p class="font-bold text-sm"><?= formatCurrency(convertCurrency($booking['total_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                            <div class="flex flex-col items-end gap-0.5 mt-1">
+                                                <p class="text-[9px] font-bold text-emerald-600">DP: <?= formatCurrency(convertCurrency($booking['downpayment_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                                <p class="text-[9px] font-bold text-orange-600">Bal: <?= formatCurrency(convertCurrency($booking['balance_amount'], 'PHP', $selected_currency), $selected_currency) ?></p>
+                                            </div>
                                         </div>
-                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase <?= 
-                                            $booking['booking_status'] === 'completed' ? 'bg-green-100 text-green-700' : 
-                                            ($booking['booking_status'] === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700')
-                                        ?>">
-                                            <?= $booking['booking_status'] ?>
-                                        </span>
+                                        <div class="flex flex-col items-end gap-2">
+                                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase <?=
+                                                $booking['booking_status'] === 'completed' ? 'bg-green-100 text-green-700' :
+                                                ($booking['booking_status'] === 'active' ? 'bg-blue-100 text-blue-700' :
+                                                ($booking['booking_status'] === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-700'))
+                                            ?>">
+                                                <?= $booking['booking_status'] ?>
+                                            </span>
+                                            <a href="booking_details.php?id=<?= $booking['id'] ?>" class="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline">
+                                                Details <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

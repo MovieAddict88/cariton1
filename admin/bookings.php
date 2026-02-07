@@ -126,18 +126,26 @@ try {
                                             </span>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <form method="POST" class="inline">
-                                                <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
-                                                <input type="hidden" name="update_driver" value="1">
-                                                <select name="driver_id" onchange="this.form.submit()" class="text-[10px] font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900 focus:ring-primary w-full">
-                                                    <option value="">No Driver</option>
-                                                    <?php foreach ($all_drivers as $ad): ?>
-                                                        <option value="<?= $ad['id'] ?>" <?= $b['driver_id'] == $ad['id'] ? 'selected' : '' ?>>
-                                                            <?= htmlspecialchars($ad['first_name'] . ' ' . $ad['last_name']) ?> (<?= $ad['employee_id'] ?>) <?= $ad['status'] !== 'active' ? '['.strtoupper($ad['status']).']' : '' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </form>
+                                            <div class="flex flex-col gap-1">
+                                                <form method="POST" class="inline">
+                                                    <input type="hidden" name="booking_id" value="<?= $b['id'] ?>">
+                                                    <input type="hidden" name="update_driver" value="1">
+                                                    <select name="driver_id" onchange="this.form.submit()" class="text-[10px] font-bold border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-900 focus:ring-primary w-full cursor-pointer">
+                                                        <option value="">Assign Driver</option>
+                                                        <?php foreach ($all_drivers as $ad): ?>
+                                                            <option value="<?= $ad['id'] ?>" <?= $b['driver_id'] == $ad['id'] ? 'selected' : '' ?>>
+                                                                <?= htmlspecialchars($ad['first_name'] . ' ' . $ad['last_name']) ?> (<?= $ad['employee_id'] ?>)
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </form>
+                                                <?php if ($b['driver_id']): ?>
+                                                    <div class="flex items-center gap-1 text-[9px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-2 py-0.5 rounded-full w-fit">
+                                                        <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1">license</span>
+                                                        <?= htmlspecialchars($b['driver_first_name'] . ' ' . $b['driver_last_name']) ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
                                             <a href="booking_details.php?id=<?= $b['id'] ?>"
