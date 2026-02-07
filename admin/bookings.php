@@ -123,7 +123,7 @@ try {
             </button>
         </header>
 
-        <main class="flex-1 overflow-y-auto fluid-p pb-24 admin-content">
+        <main class="flex-1 overflow-y-auto fluid-p admin-content" style="padding-bottom: 12rem !important;">
             <?php if ($message): ?>
                 <div class="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6">
                     <?= htmlspecialchars($message) ?>
