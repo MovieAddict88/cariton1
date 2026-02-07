@@ -52,9 +52,31 @@ try {
     
     // Handle status updates
     if (isset($_POST['update_status'])) {
-        $stmt = $pdo->prepare("UPDATE bookings SET booking_status = ? WHERE id = ?");
-        $stmt->execute([$_POST['status'], $_POST['booking_id']]);
-        $message = "Booking status updated to " . $_POST['status'];
+        $status = $_POST['status'];
+        $booking_id = $_POST['booking_id'];
+
+        $pdo->beginTransaction();
+        try {
+            $stmt = $pdo->prepare("UPDATE bookings SET booking_status = ? WHERE id = ?");
+            $stmt->execute([$status, $booking_id]);
+
+            // If completed, make vehicle available again
+            if ($status === 'completed') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'available' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+            // If active, mark vehicle as rented
+            if ($status === 'active') {
+                $stmt = $pdo->prepare("UPDATE vehicles SET status = 'rented' WHERE id = (SELECT vehicle_id FROM bookings WHERE id = ?)");
+                $stmt->execute([$booking_id]);
+            }
+
+            $pdo->commit();
+            $message = "Booking status updated to " . $status;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $error = "Error updating status: " . $e->getMessage();
+        }
     }
 
     if (isset($_POST['update_driver'])) {
@@ -105,6 +127,12 @@ try {
             <?php if ($message): ?>
                 <div class="bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-400 text-emerald-700 dark:text-emerald-300 px-4 py-3 rounded-xl mb-6">
                     <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error): ?>
+                <div class="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl mb-6">
+                    <?= htmlspecialchars($error) ?>
                 </div>
             <?php endif; ?>
 
